@@ -1,0 +1,62 @@
+class Course:
+    def __init__(self, code, term, pre, uoc):
+        self.code = code
+        # List
+        self.term = term
+        self.pre = pre
+        self.uoc = uoc
+
+# Y1T1
+comp1511 = Course("COMP1511", [1, 2, 3], [], 6)
+math1081 = Course("MATH1081", [1, 2, 3], [], 6) # Co-requisite with 1141
+math1141 = Course("MATH1141", [1, 3], [], 6)
+# Y1T2
+comp2521 = Course("COMP2521", [1, 2, 3], ["COMP1511"], 6)
+data1001 = Course("DATA1001", [2], [], 6)
+math1241 = Course("MATH1241", [1, 2], ["MATH1141"], 6)
+# Y1T3
+comp1521 = Course("COMP1521", [2, 3], ["COMP1511"], 6)
+comp1531 = Course("COMP1531", [1, 3], ["COMP1511"], 6)
+math2621 = Course("MATH2621", [3], ["MATH1241"], 6)
+# Y2T1
+comp3411 = Course("COMP3411", [4, 1], ["COMP2521"], 6)
+comp3821 = Course("COMP3821", [1], ["COMP2521"], 6)
+math2111 = Course("MATH2111", [1], ["MATH1241"], 6)
+# Y2T2
+comp2511 = Course("COMP2511", [2, 3], ["COMP1531", "COMP2521"], 6)
+math2601 = Course("MATH2601", [2], ["MATH1241"], 6)
+math2901 = Course("MATH2901", [2], ["MATH1241"], 6)
+# Y2T3
+math2931 = Course("MATH2931", [3], ["MATH2901"], 6)
+scif1131 = Course("SCIF1131", [1, 3], [], 6)
+comp3311 = Course("COMP3311", [1, 3], ["COMP2521"], 6)
+
+courses = []
+courses.append(comp1511)
+courses.append(math1081)
+courses.append(math1141)
+courses.append(comp2521)
+courses.append(data1001)
+courses.append(math1241)
+courses.append(comp1521)
+courses.append(comp1531)
+courses.append(math2621)
+courses.append(comp3411)
+courses.append(comp3821)
+courses.append(math2111)
+courses.append(comp2511)
+courses.append(math2601)
+courses.append(math2901)
+courses.append(math2931)
+courses.append(scif1131)
+courses.append(comp3311)
+
+# Lookup course name
+def lookup(check):
+    for course in courses:
+        if course.code == check:
+            return course
+    return None
+
+# Ensure all prerequisites are selected
+# Summer option

@@ -1,0 +1,34 @@
+.header {
+    text-align: left;
+    text-decoration: none;
+    padding: 1em;
+    background-color: #ffa02c;
+}
+
+.header a {
+    text-decoration: none;
+    font-size: 2em;
+}
+
+body {
+    margin: 1em;
+    background: #50becb;
+}
+
+.block {
+    padding: 1em;
+    text-align: center;
+    background-color: #f9f96c;
+}
+
+.content {
+    text-align: left;
+    display: inline-block;
+}
+
+.footer {
+    padding: 0.5em;
+    text-align: center;
+    background-color: red;
+}
+
