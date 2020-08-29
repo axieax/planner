@@ -1,5 +1,6 @@
 from courses import Course, courses, lookup
 import queue
+import json
 
 # Planner
 plan = [[] for i in range(len(courses))]
@@ -141,14 +142,15 @@ def main(courses):
                 pq.put((-totalDependencies(prereqs, [], connection), connection))
 
     # print(plan)
-    returnString = ""
+    output = {}
 
     for term in range(len(plan)):
         t = "Summer" if (term + 1) % 4 == 0 else term % 4 + 1
-        returnString += f"Year {term // 4 + 1} Term {t}: {plan[term]}\n"
+        output[f"Year {term // 4 + 1} Term {t}"] = plan[term]
 
-    print(returnString)
-    return returnString
+    dump = json.dumps(output, indent=4)
+    print(dump)
+    return dump
 
 
     # for course in courses:

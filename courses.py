@@ -6,6 +6,8 @@ class Course:
         self.pre = pre
         self.uoc = uoc
 
+courses = []
+
 # Y1T1
 comp1511 = Course("COMP1511", [1, 2, 3], [], 6)
 math1081 = Course("MATH1081", [1, 2, 3], [], 6) # Co-requisite with 1141
@@ -30,8 +32,26 @@ math2901 = Course("MATH2901", [2], ["MATH1241"], 6)
 math2931 = Course("MATH2931", [3], ["MATH2901"], 6)
 scif1131 = Course("SCIF1131", [1, 3], [], 6)
 comp3311 = Course("COMP3311", [1, 3], ["COMP2521"], 6)
+# Y3T1
+math3901 = Course("MATH3901", [1], ["MATH2901", "MATH2601", "MATH2111"], 6)
+math3911 = Course("MATH3911", [1], ["MATH2931"], 6)
 
-courses = []
+# Y3T2
+math3821 = Course("MATH3821", [2], ["MATH2931"], 6)
+
+
+# Possible
+comp9318 = Course("COMP9318", [1], ["COMP2521", "COMP3311", "MATH1081"], 6)
+comp9417 = Course("COMP9417", [1, 2], ["COMP2521"], 6)
+# comp9417 = Course("COMP9417", [1, 2], ["MATH1081", "COMP1531"], 6) # Determine which comes first
+comp9444 = Course("COMP9444", [2, 3], ["COMP2521"], 6)
+
+courses.append(comp9318)
+courses.append(comp9417)
+courses.append(comp9444)
+
+
+
 courses.append(comp1511)
 courses.append(math1081)
 courses.append(math1141)
@@ -50,6 +70,9 @@ courses.append(math2901)
 courses.append(math2931)
 courses.append(scif1131)
 courses.append(comp3311)
+courses.append(math3901)
+courses.append(math3911)
+courses.append(math3821)
 
 # Lookup course name
 def lookup(check):
