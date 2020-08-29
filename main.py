@@ -148,9 +148,7 @@ def main(courses):
         t = "Summer" if (term + 1) % 4 == 0 else term % 4 + 1
         output[f"Year {term // 4 + 1} Term {t}"] = plan[term]
 
-    dump = json.dumps(output, indent=4)
-    print(dump)
-    return dump
+    return output
 
 
     # for course in courses:

@@ -5,5 +5,17 @@
 {% endblock %}
 
 {% block body %}
-<p>{{ output }}</p>
+<table>
+    <tr>
+        <th>Term</th>
+        <th>Courses</th>
+    </tr>
+    {% for k, v in output.items() %}
+        <tr>
+            <td>{{k}}</td>
+            <td>{{v}}</td>
+        </tr>
+    {% endfor %}
+</table>
+
 {% endblock %}
