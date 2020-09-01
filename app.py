@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from main import main
-from courses import courses
+from data import courses, plan, planSize
 
 app = Flask(__name__)
 
@@ -16,8 +16,9 @@ def select():
 
 
 @app.route("/plan", methods=["POST", "GET"])
-def plan():
-    output = main(courses=courses)
+def planner():
+    # POST -> data.py?
+    output = main(courses=courses, plan=plan, planSize=planSize)
     return render_template("plan.html", output=output)
 
 

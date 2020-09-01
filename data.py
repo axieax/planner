@@ -1,13 +1,10 @@
-class Course:
-    def __init__(self, code, term, pre, uoc):
-        self.code = code
-        # List
-        self.term = term
-        self.pre = pre
-        self.uoc = uoc
-
+"""
+Courses
+"""
+from adt import Course
 courses = []
 
+### Course Options ###
 # Y1T1
 comp1511 = Course("COMP1511", [1, 2, 3], [], 6)
 math1081 = Course("MATH1081", [1, 2, 3], [], 6) # Co-requisite with 1141
@@ -46,11 +43,11 @@ comp9417 = Course("COMP9417", [1, 2], ["COMP2521"], 6)
 # comp9417 = Course("COMP9417", [1, 2], ["MATH1081", "COMP1531"], 6) # Determine which comes first
 comp9444 = Course("COMP9444", [2, 3], ["COMP2521"], 6)
 
+
+### Selected Options ###
 courses.append(comp9318)
 courses.append(comp9417)
 courses.append(comp9444)
-
-
 
 courses.append(comp1511)
 courses.append(math1081)
@@ -74,12 +71,21 @@ courses.append(math3901)
 courses.append(math3911)
 courses.append(math3821)
 
-# Lookup course name
-def lookup(check):
-    for course in courses:
-        if course.code == check:
-            return course
-    return None
 
-# Ensure all prerequisites are selected
-# Summer option
+"""
+Plan
+"""
+# Plan - can have courses already in certain terms
+plan = [[] for i in range(len(courses))]
+
+# Max num of courses per term
+planSize = [3 for i in range(len(courses))]
+
+
+"""
+Front end design:
+    Bundle courses by category
+    Ensure all prerequisites are selected - select prerequisites as well automatically
+    Drag and drop interface for pre-planned
+    Summer option
+"""
