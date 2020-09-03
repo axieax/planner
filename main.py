@@ -41,7 +41,7 @@ def lastPlaced(plan, course):
 
 
 # Places a course
-def place(plan, planSize, courses, pq, course):
+def place(prereqs, plan, planSize, courses, pq, course):
     # Place after last prereq, if prereq unplaced - return to pq - may have infinite loop
     # priority by prereqs placed?
 
@@ -103,7 +103,7 @@ def main(courses, plan, planSize):
         # print(f"PQ: {pq.queue}")
         # Dequeue and place course
         course = pq.get()[2]
-        place(plan, planSize, courses, pq, course)
+        place(prereqs, plan, planSize, courses, pq, course)
         # Add unplaced dependencies to priority queue
         for connection in prereqs.connections[course]:
             if checkPlaced(plan, connection) is False:
