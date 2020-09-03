@@ -90,10 +90,10 @@ def main(courses, plan, planSize):
     # Creates a priority queue for placement
     pq = queue.PriorityQueue()
     # Courses are represented and sorted by a tuple (totalDependencies, courseYearCode, course)
-    # totalDependencies are negative since the pq module sorts by least priority
+    # totalDependencies are negative since the pq function sorts by least priority
 
     # Place courses with no prerequisites in priority queue
-    for course in prereqs.no_pre:
+    for course in prereqs.noPreCourses:
         pq.put((-totalDependencies(prereqs, [], course), int(course[4]), course))
 
     ## Alternative: place all courses in pq first

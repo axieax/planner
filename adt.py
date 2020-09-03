@@ -29,24 +29,24 @@ Directed Graph ADT
 class Vertex:
     def __init__(self, course):
         self.course = course
-        self.num_pres = len(course.pre)
+        self.numPres = len(course.pre)
 
 
 # Graph Class
 class Graph:
     def __init__(self, courses):
-        self.num_vertices = 0
+        self.numVertices = 0
         # Adjacency list representation of outgoing connections
         self.connections = {course.code: [] for course in courses}
-        self.no_pre = []
+        self.noPreCourses = []
 
     # Add a vertex to graph
     def addVertex(self, course):
-        self.num_vertices += 1
+        self.numVertices += 1
         node = Vertex(course)
-        if node.num_pres == 0:
+        if node.numPres == 0:
             # Append to list of no-prerequisites
-            self.no_pre.append(course.code)
+            self.noPreCourses.append(course.code)
         else:
             # Connect each prerequisite to current course
             for prereq in course.pre:
