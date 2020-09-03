@@ -63,7 +63,7 @@ def place(plan, planSize, courses, pq, course):
     # Not all prerequisites placed
     elif lastIndex == -1:
         # Return to priority queue with less priority?
-        pq.put((-totalDependencies(prereqs, [], course) + 1, course))
+        pq.put((-totalDependencies(prereqs, [], course) + 1, int(course[4]), course))
         return
 
     # Determine Year
@@ -89,23 +89,25 @@ def main(courses, plan, planSize):
 
     # Creates a priority queue for placement
     pq = queue.PriorityQueue()
-    # Courses are represented by a tuple (totalDependencies, course)
+    # Courses are represented and sorted by a tuple (totalDependencies, courseYearCode, course)
     # totalDependencies are negative since the pq module sorts by least priority
 
     # Place courses with no prerequisites in priority queue
     for course in prereqs.no_pre:
-        pq.put((-totalDependencies(prereqs, [], course), course))
+        pq.put((-totalDependencies(prereqs, [], course), int(course[4]), course))
+
+    ## Alternative: place all courses in pq first
 
     # Place courses
     while not pq.empty():
         # print(f"PQ: {pq.queue}")
         # Dequeue and place course
-        course = pq.get()[1]
+        course = pq.get()[2]
         place(plan, planSize, courses, pq, course)
         # Add unplaced dependencies to priority queue
         for connection in prereqs.connections[course]:
             if checkPlaced(plan, connection) is False:
-                pq.put((-totalDependencies(prereqs, [], connection), connection))
+                pq.put((-totalDependencies(prereqs, [], connection), int(connection[4]), connection))
 
     # Generate dictionary to store plan
     output = {}
