@@ -126,6 +126,8 @@ def main(courses, plan, planSize):
     for term in output.items():
         print(term)
 
+    print(len(courses) * 6)
+
     return output
 
 

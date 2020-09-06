@@ -44,32 +44,86 @@ comp9417 = Course("COMP9417", [1, 2], ["COMP2521"], 6)
 comp9444 = Course("COMP9444", [2, 3], ["COMP2521"], 6)
 
 
+# 3781 2020 Version
+
 ### Selected Options ###
+
+""" Computer Science (96) """
+# Artificial Intelligence Major (78)
+# Core (72 - 18 = 54)
+courses.append(comp1511)
+courses.append(comp1521)
+courses.append(comp1531)
+courses.append(comp2511)
+courses.append(comp2521)
+courses.append(comp3411)
+courses.append(comp3821)
+# courses.append(comp3900) cs project
+# courses.append(comp4920) ethics
+
+# Artificial Intelligence Prescribed Electives (18)
 courses.append(comp9318)
 courses.append(comp9417)
 courses.append(comp9444)
 
-courses.append(comp1511)
+# Lvl 3|4|6|9 Computing Elective (6) - 2021 version includes VIP projects
+courses.append(comp3311)
+
+
+""" Advanced Mathematics (138) """
+# Level 1 Core Course (6)
+courses.append(scif1131)
+
+# Advanced Statistics (78)
+# Level 1 Core Courses (18)
 courses.append(math1081)
 courses.append(math1141)
-courses.append(comp2521)
-courses.append(data1001)
 courses.append(math1241)
-courses.append(comp1521)
-courses.append(comp1531)
-courses.append(math2621)
-courses.append(comp3411)
-courses.append(comp3821)
+
+# Level 2 Core Courses (30)
 courses.append(math2111)
-courses.append(comp2511)
 courses.append(math2601)
+courses.append(math2621)
 courses.append(math2901)
 courses.append(math2931)
-courses.append(scif1131)
-courses.append(comp3311)
+
+# Level 3 Core Courses (24)
+courses.append(math3821)
 courses.append(math3901)
 courses.append(math3911)
-courses.append(math3821)
+pass
+
+# Level 3 Prescribed Electives (6)
+pass
+
+# Level 1 Computer Science Elective Requirement (met - 6)
+
+
+# Honours (48)
+# Core Courses (30)
+pass
+pass
+pass
+pass
+pass
+
+# Thesis Courses (18)
+pass
+pass
+pass
+
+
+""" Makeup Electives """
+# Duplicate Mathematics (18)
+pass
+pass
+pass
+
+# Level 1 Computer Science Elective Requirement under Mathematics (6)
+pass
+
+# Science Elective for Advanced Statistics (6)
+courses.append(data1001)
 
 
 """
@@ -88,4 +142,9 @@ Front end design:
     Ensure all prerequisites are selected - select prerequisites as well automatically
     Drag and drop interface for pre-planned
     Summer option
+Back end design:
+    Separate function in main.py for calculating last placed term index for (within place function):
+        Year placement
+        UOC placement
+    Choose prereq option
 """
