@@ -131,7 +131,8 @@ def main(courses, plan, planSize):
     return output
 
 
-main(courses, plan, planSize)
+if __name__ == '__main__':
+    main(courses, plan, planSize)
 
 ### Notes:
 # Maybe try to place courses with no-pres earlier in plan - easier, such as SCIF1131?
