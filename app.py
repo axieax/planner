@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from main import main
+from algo import main
 from data import courses, plan, planSize
 
 app = Flask(__name__)

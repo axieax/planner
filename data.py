@@ -1,3 +1,19 @@
+# scrape data - courses and degrees
+courses = {}
+
+def scrape_data():
+    bad_courses = []
+    # prereq - UOC, WAM, COURSES, YEAR
+    pass
+
+
+def check_plan():
+    # prereqs
+    # equivalent courses
+    pass
+
+
+
 """
 Courses
 """
