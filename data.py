@@ -1,7 +1,7 @@
 """
 Courses
 """
-from adt import Course
+from util import Course
 courses = []
 
 ### Course Options ###

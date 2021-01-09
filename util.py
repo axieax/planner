@@ -66,3 +66,14 @@ class Graph:
 Queue ADT
 """
 import queue
+
+
+"""
+Prerequisite Logic Parser
+"""
+def prereq_parser(prereq):
+    '''
+    Returns a list of all possible combinations (topmost OR) for a prereq string
+    where each combination is represented by a list (AND)
+    '''
+    pass

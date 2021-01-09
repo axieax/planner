@@ -1,4 +1,4 @@
-from adt import Course, lookup, Vertex, Graph, queue
+from util import Course, lookup, Vertex, Graph, queue
 from data import courses, plan, planSize
 import json
 
