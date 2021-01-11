@@ -1,19 +1,9 @@
 from util import Course, lookup, Vertex, Graph, queue
-from data import courses, plan, planSize
+from data import courses, plan, planSize, all_courses
+from util import relevant_prereqs_filter
 import json
 
 # TODO: need to rewrite logic due to changing of Course structure
-
-
-# Counts the total number of courses that are dependent on specified course - not just immediate
-def totalDependencies(prereqs, counted, course):
-    connections = prereqs.returnConnections(course)
-    for connection in connections:
-        if len(connection) != 0 and connection not in counted:
-            counted.append(connection)
-            totalDependencies(prereqs, counted, connection)
-    return len(counted)
-
 
 # Determines whether a course has already been placed in the plan
 def checkPlaced(plan, course):
@@ -83,60 +73,71 @@ def place(prereqs, plan, planSize, courses, pq, course):
                 return
 
 
-def main(courses, plan, planSize):
-    # Create a graph representing course prerequisites
-    prereqs = Graph(courses)
-    for course in courses:
-        prereqs.addVertex(course)
+def main(selected_course_codes, plan, plan_specs):
+    '''
+    selected_courses (list of Course objects)
+    plan (arr)
+    plan_specs (dict containing info about each term in plan)
+        e.g. max_uoc, term 0/1/2/3, 
+    '''
+    # filter relevant prerequisites
+    selected_courses = {}
+    for course_code in selected_course_codes:
+        # retrieve course data
+        original_course = all_courses[course_code]
+        # filter prerequisites, keeping those relevant to the selected courses
+        new_course = Course(course_code, original_course.terms, '', original_course.uoc)
+        new_course.prereqs = relevant_prereqs_filter(selected_course_codes, original_course) # getter and setter
+        selected_courses[course_code] = new_course
+    
+    # set up a graph representing course prerequisites
+    prereqs = Graph(selected_courses.values())
 
-    # Creates a priority queue for placement
+
+    # calculate courses available in each term??
+    summer_courses = [course for course in selected_courses.values() if 0 in course.terms]
+    term_1_course = [course for course in selected_courses.values() if 1 in course.terms]
+    term_2_course = [course for course in selected_courses.values() if 2 in course.terms]
+    term_3_course = [course for course in selected_courses.values() if 3 in course.terms]
+
+
+
+    # create a priority queue for course placement
+    # courses are represented and sorted by a tuple (total_dependencies, course_level, course_name)
+    # since the priority queue sorts by least priority, lower valued tuples have higher priority
     pq = queue.PriorityQueue()
-    # Courses are represented and sorted by a tuple (totalDependencies, courseYearCode, course)
-    # totalDependencies are negative since the pq function sorts by least priority
 
-    # Place courses with no prerequisites in priority queue
-    for course in prereqs.noPreCourses:
-        pq.put((-totalDependencies(prereqs, [], course), int(course[4]), course))
+    # place courses with no prerequisites in priority queue first if other courses depend on it
+    for course_code in prereqs.no_pre_courses:
+        course = selected_courses[course_code]
+        total_dependencies = prereqs.total_dependencies(course_code, {})
+        if len(total_dependencies) > 0:
+            pq.put((-len(total_dependencies), course.level, course))
 
-    ## Alternative: place all courses in pq first
-
-    # Place courses
+    # check
+    for course in selected_courses.values():
+        print(course)
+    
+    
+    # place courses
     while not pq.empty():
-        # print(f"PQ: {pq.queue}")
-        # Dequeue and place course
         course = pq.get()[2]
-        place(prereqs, plan, planSize, courses, pq, course)
-        # Add unplaced dependencies to priority queue
-        for connection in prereqs.connections[course]:
-            if checkPlaced(plan, connection) is False:
-                pq.put((-totalDependencies(prereqs, [], connection), int(connection[4]), connection))
+        place()
+        for dependency_code in prereqs.immediate_dependencies(course.code):
+            dependency = selected_courses[dependency_code]
+            if not already_placed(plan, dependency): # course code or object??
+                total_dependencies = prereqs.total_dependencies(dependency_code, {})
+                pq.put((-len(total_dependencies), dependency.level, dependency))
 
-    # Generate dictionary to store plan
-    output = {}
-
-    # Determine last-placed term
-    lastTerm = 0
-    for term in range(len(plan)):
-        lastTerm = term if len(plan[term]) != 0 else lastTerm
-
-    # Write to dictionary
-    for term in range(0, lastTerm + 1):
-        termText = "Summer" if (term + 1) % 4 == 0 else term % 4 + 1
-        output[f"Year {term // 4 + 1} Term {termText}"] = plan[term]
-
-    # Display output
-    for term in output.items():
-        print(term)
-
-    print(len(courses) * 6)
-
-    return output
+    print(plan)
+    # calculate finishing term and total length
+    return {}
 
 
 if __name__ == '__main__':
-    main(courses, plan, planSize)
+    main([course.code for course in courses], plan, planSize)
 
 ### Notes:
 # Maybe try to place courses with no-pres earlier in plan - easier, such as SCIF1131?
-# Consider both term offerings not just the first available option
+# Consider both term offerings not just the first available option TODO
 # Find last placed course and don't write terms after it

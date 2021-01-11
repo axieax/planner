@@ -1,5 +1,12 @@
 # scrape data - courses and degrees
-courses = {}
+all_degrees = {} # indexed by degree_code
+all_courses = {} # indexed by course_code
+
+# load pickled data
+
+
+
+
 
 def scrape_data():
     bad_courses = []
@@ -19,6 +26,8 @@ Courses
 """
 from util import Course
 courses = []
+
+# ALL COURSES AS A DICT? with code as key
 
 ### Course Options ###
 # currently have to manually remove mark requirements
@@ -47,10 +56,13 @@ comp3121 = Course('COMP3121', [2, 3], 'COMP1927 or COMP2521', 6)
 comp3231 = Course('COMP3231', [1], '(COMP1521 or DPST1092 or COMP2121 or ELEC2142) and (COMP2521 or COMP1927)', 6)
 comp3311 = Course('COMP3311', [1, 3], 'COMP2521 or COMP1927', 6)
 comp3411 = Course('COMP3411', [0, 1], 'COMP2521 or COMP1927', 6)
-comp3900 = Course('COMP3900', [1, 2, 3], 'COMP1531, and COMP2521 or COMP1927, and enrolled in a BSc Computer Science major with completion of 102 uoc', 6)
+# comp3900 = Course('COMP3900', [1, 2, 3], 'COMP1531, and COMP2521 or COMP1927, and enrolled in a BSc Computer Science major with completion of 102 uoc', 6)
+comp3900 = Course('COMP3900', [1, 2, 3], 'COMP1531 and (COMP2521 or COMP1927)', 6)
 comp4418 = Course('COMP4418', [3], 'COMP3411', 6)
-comp4920 = Course('COMP4920', [3], '(COMP2511 or COMP2911) and completion of 96 UOC in Computer Science.', 6)
-comp6841 = Course('COMP6841', [1], 'Completion of 48 UOC, and COMP1927 or COMP2521') # !!!
+# comp4920 = Course('COMP4920', [3], '(COMP2511 or COMP2911) and completion of 96 UOC in Computer Science.', 6)
+comp4920 = Course('COMP4920', [3], '(COMP2511 or COMP2911)', 6)
+# comp6841 = Course('COMP6841', [1], 'Completion of 48 UOC, and COMP1927 or COMP2521') # !!!
+comp6841 = Course('COMP6841', [1], 'COMP1927 or COMP2521', 6) # !!!
 comp9318 = Course('COMP9318', [1], '(COMP2521 or COMP1927) and COMP3311 and MATH1081', 6)
 comp9417 = Course('COMP9417', [1, 2], '(MATH1081 and (COMP1531 or COMP2041)) or (COMP1927 or COMP2521)', 6) # determine which comes first
 comp9418 = Course('COMP9418', [3], 'COMP9417', 6)
@@ -65,11 +77,13 @@ math2601 = Course('MATH2601', [2], 'MATH1231 or DPST1014 or MATH1241 or MATH1251
 math2621 = Course('MATH2621', [3], 'MATH1231 or DPST1014 or MATH1241 or MATH1251', 6)
 math2901 = Course('MATH2901', [2], 'MATH1231 or MATH1241 or MATH1251 or DPST1014', 6)
 math2931 = Course('MATH2931', [3], 'MATH2901 or MATH2801', 6)
-math3411 = Course('MATH3411', [1, 3], 'MATH1081 or MATH1231(CR) or DPST1014 (CR) or MATH1241(CR) or MATH1251(CR) or MATH2099', 6)
-math3521 = Course('MATH3521', [1], '12 units of credit in Level 2 Math courses', 6) # under conditions for enrolment
+# math3411 = Course('MATH3411', [1, 3], 'MATH1081 or MATH1231(CR) or DPST1014 (CR) or MATH1241(CR) or MATH1251(CR) or MATH2099', 6)
+math3411 = Course('MATH3411', [1, 3], 'MATH1081 or MATH1231 or DPST1014 or MATH1241 or MATH1251 or MATH2099', 6)
+# math3521 = Course('MATH3521', [1], '12 units of credit in Level 2 Math courses', 6) # under conditions for enrolment
 math3821 = Course('MATH3821', [2], 'MATH2831 or MATH2931', 6)
 math3871 = Course('MATH3871', [3], 'MATH2801 or MATH2901', 6)
-math3901 = Course('MATH3901', [1], 'MATH2901 or MATH2801(DN) and MATH2501 or MATH2601 and MATH2011 or MATH2111 or MATH2510 or MATH2610', 6) # BAD LOGIC
+# math3901 = Course('MATH3901', [1], 'MATH2901 or MATH2801(DN) and MATH2501 or MATH2601 and MATH2011 or MATH2111 or MATH2510 or MATH2610', 6) # BAD LOGIC
+math3901 = Course('MATH3901', [1], '((MATH2901 or MATH2801) and (MATH2501 or MATH2601) and (MATH2011 or MATH2111)) or (MATH2510 or MATH2610)', 6) # BAD LOGIC
 math3911 = Course('MATH3911', [1], 'MATH2931 or MATH2831', 6)
 
 
@@ -88,7 +102,7 @@ courses.append(math2621)
 courses.append(comp3411)
 courses.append(comp6841)
 courses.append(math2111)
-courses.append(engg2600) # * 3
+# courses.append(engg2600) # * 3 - placing it once automatically places it for the next 2 terms??
 courses.append(comp3121)
 courses.append(math2601)
 courses.append(math2901)
@@ -104,10 +118,12 @@ courses.append(math3821)
 courses.append(comp3900)
 courses.append(comp4920)
 courses.append(math3871)
-courses.append(scif3199)
+# courses.append(scif3199)
 courses.append(comp3231)
-courses.append(math3521)
+# courses.append(math3521)
 courses.append(math3901)
+
+all_courses = {course.code: course for course in courses}
 
 
 """
