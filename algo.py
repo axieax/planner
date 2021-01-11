@@ -112,13 +112,8 @@ def main(selected_course_codes, plan, plan_specs):
         course = selected_courses[course_code]
         total_dependencies = prereqs.total_dependencies(course_code, {})
         if len(total_dependencies) > 0:
-            pq.put((-len(total_dependencies), course.level, course))
+            pq.put((-len(total_dependencies), course.level, course))  
 
-    # check
-    for course in selected_courses.values():
-        print(course)
-    
-    
     # place courses
     while not pq.empty():
         course = pq.get()[2]
