@@ -35,6 +35,9 @@ def test_simple_combination():
     # assert prereq_parser('a and (b or c)') == prereq_parser('(a and b) or (a and c)') == [['a', 'b'], ['a', 'c']]
     assert prereq_parser('(a and b) or (c and d)') == [['a', 'b'], ['c', 'd']]
 
+def test_complex_combination():
+    assert len(prereq_parser('(a or b or c or d) and (e or f)')) == 4 * 2
+
 def test_courses():
     # comp1511
     cs1511 = prereq_parser('COMP1511 or DPST1091 or COMP1911 or COMP1917')

@@ -34,7 +34,7 @@ def lookup(courses, check):
     Course name lookup - returns Course object given course code (str) if it exists
     '''
     for course in courses:
-        if course.code == check:
+        if course.code == check: # lower case
             return course
     return None
 
@@ -97,7 +97,6 @@ Prerequisite Logic Parser
 import re
 const_symbols = ['and', 'or', '(', ')']
 
-
 def prereq_parser(prereq_string):
     '''
     Returns a 2D list of all possible combinations (topmost OR) for a prereq_string
@@ -121,7 +120,8 @@ def prereq_parser(prereq_string):
             prereqs.pop(last_open)
         prereqs.insert(last_open, bracket_prereqs)
 
-    return prereq_parser_simple(prereqs)
+    ans = prereq_parser_simple(prereqs)
+    return ans
 
 
 def prereq_str_to_list(prereq_string):
@@ -153,12 +153,14 @@ def prereq_parser_simple(prereqs):
 
     # parse simple prereqs - removing keywords
     if 'and' in prereqs:
-        return list_and_join([x for x in prereqs if x != 'and'])
+        # memoization for list_and_join to ensure unique combinations
+        ans = list_and_join([x for x in prereqs if x != 'and'], memo={})
+        return ans
     else:
         return flatten_lists([x for x in prereqs if x != 'or'])
 
 
-def list_and_join(prereqs_list):
+def list_and_join(prereqs_list, memo):
     '''
     Joins a list of prereqs with pairwise AND logic
     Input: 3D list (top level AND, then prereqs, then prereq)
@@ -186,14 +188,18 @@ def list_and_join(prereqs_list):
                 if prereqs_index < len(prereqs_list) - 1:
                     # include prereqs after the prereqs with multiple options if they exist
                     new.append(after)
+                new_lists = flatten_lists(new)
+                # only include unique combinations
+                if str(new_lists) not in memo:
+                    ans.append(list_and_join(new_lists, memo))
 
-                ans.append(list_and_join(flatten_lists(new)))
             linear = False
 
-    # no combinations present (simple) - use associative logic law
-    # [[['b']], [['c']] ] => [['b', 'c']]
-    # [[['a', 'b']], [['c']] ] => [['a', 'b', 'c']]
+    memo[str(prereqs_list)] = True
     if linear:
+        # no combinations present (simple) - use associative logic law
+        # [[['b']], [['c']] ] => [['b', 'c']]
+        # [[['a', 'b']], [['c']] ] => [['a', 'b', 'c']]
         # flattening process (ignore level ordering):
         # [[['a', 'b']], [['c']]] => [['a', 'b'], ['c']] => ['a', 'b', 'c']
         # then we want [['a', 'b', 'c']]
@@ -206,3 +212,8 @@ def list_and_join(prereqs_list):
 
 def flatten_lists(lists):
     return sum(lists, [])
+
+
+if __name__ == '__main__':
+    # run prereq parser
+    print(prereq_parser(input()))
