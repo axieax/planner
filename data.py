@@ -38,7 +38,8 @@ data1001 = Course('DATA1001', [2], '', 6)
 
 ''' SCIF '''
 scif1131 = Course('SCIF1131', [1, 3], '', 6)
-scif3199 = Course('SCIF3199', [0, 1, 2, 3], '48 units of credit', 6) # found under 'conditions for enrolment'
+# scif3199 = Course('SCIF3199', [0, 1, 2, 3], '48 units of credit', 6) # found under 'conditions for enrolment'
+scif3199 = Course('SCIF3199', [0, 1, 2, 3], '', 6) # found under 'conditions for enrolment'
 
 ''' ENGG '''
 engg2600 = Course('ENGG2600', [1, 2, 3], '??', 2) # !!!
@@ -80,12 +81,12 @@ math2931 = Course('MATH2931', [3], 'MATH2901 or MATH2801', 6)
 # math3411 = Course('MATH3411', [1, 3], 'MATH1081 or MATH1231(CR) or DPST1014 (CR) or MATH1241(CR) or MATH1251(CR) or MATH2099', 6)
 math3411 = Course('MATH3411', [1, 3], 'MATH1081 or MATH1231 or DPST1014 or MATH1241 or MATH1251 or MATH2099', 6)
 # math3521 = Course('MATH3521', [1], '12 units of credit in Level 2 Math courses', 6) # under conditions for enrolment
+math3521 = Course('MATH3521', [1], 'MATH2111 and MATH2621', 6) # under conditions for enrolment
 math3821 = Course('MATH3821', [2], 'MATH2831 or MATH2931', 6)
 math3871 = Course('MATH3871', [3], 'MATH2801 or MATH2901', 6)
 # math3901 = Course('MATH3901', [1], 'MATH2901 or MATH2801(DN) and MATH2501 or MATH2601 and MATH2011 or MATH2111 or MATH2510 or MATH2610', 6) # BAD LOGIC
 math3901 = Course('MATH3901', [1], '((MATH2901 or MATH2801) and (MATH2501 or MATH2601) and (MATH2011 or MATH2111)) or (MATH2510 or MATH2610)', 6) # BAD LOGIC
 math3911 = Course('MATH3911', [1], 'MATH2931 or MATH2831', 6)
-
 
 # 3789 2021 Version
 
@@ -118,9 +119,9 @@ courses.append(math3821)
 courses.append(comp3900)
 courses.append(comp4920)
 courses.append(math3871)
-# courses.append(scif3199)
+courses.append(scif3199)
 courses.append(comp3231)
-# courses.append(math3521)
+courses.append(math3521)
 courses.append(math3901)
 
 all_courses = {course.code: course for course in courses}
@@ -133,8 +134,10 @@ Plan
 plan = [[] for i in range(len(courses))]
 
 # Max num of courses per term
-planSize = [3 for i in range(len(courses))]
-
+plan_specs = {
+    'starting_term': 1,
+    'max_uoc': [20 for i in range(len(courses))],
+}
 
 """
 Front end design:

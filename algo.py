@@ -1,76 +1,93 @@
-from util import Course, lookup, Vertex, Graph, queue
-from data import courses, plan, planSize, all_courses
-from util import relevant_prereqs_filter
 import json
-
-# TODO: need to rewrite logic due to changing of Course structure
-
-# Determines whether a course has already been placed in the plan
-def checkPlaced(plan, course):
-    for term in plan:
-        if course in term:
-            return True
-    return False
+from util import Course, lookup, Vertex, Graph, queue
+from data import courses, plan, plan_specs, all_courses
+from util import relevant_prereqs_filter
 
 
-# Returns the index corresponding to when the last prerequisite is
-def lastPlaced(plan, course):
-    courseObject = lookup(courses, course)
-    latestIndex = -1
-    allPlaced = True
-    for prereq in courseObject.pre:
-        placed = False
-        # Check if prereq has been placed
-        for term in plan:
-            if prereq in term:
-                placed = True
-                latestIndex = plan.index(term) if plan.index(term) > latestIndex else latestIndex
-        # If prereq has not been placed yet
-        if placed is False:
-            allPlaced = False
-            break
-    return latestIndex if allPlaced is True else -1
+def placed_index(plan, course):
+    '''
+    Finds the index where a course has been placed in the plan, returning -1 if unable to
+    '''
+    for plan_index, term_courses in enumerate(plan):
+        if course in term_courses:
+            return plan_index
+    return -1
 
 
-# Places a course
-def place(prereqs, plan, planSize, courses, pq, course):
-    # Place after last prereq, if prereq unplaced - return to pq - may have infinite loop
-    # priority by prereqs placed?
+def first_possible_placement(plan, plan_specs, selected_courses, course):
+    '''
+    Returns the first possible term index in the given plan where a course can be placed
+    -1 if prerequisites cannot be satisfied
+    '''
+    # NOTE: co-requisite (first_possible_index could be earlier)
+    
+    # courses without prerequisites can be placed anytime
+    earliest_placement = plan_specs['starting_term'] if course.num_prerequisites() == 0 else -1
+    for comb in course.prereqs:
+        # find the last term index where all the prerequisites are satisfied
+        last_satisfied = -1
+        all_placed = True
+        for prereq_code in comb:
+            # retrieve information about prerequisite
+            prereq = selected_courses[prereq_code]
+            prereq_index = placed_index(plan, prereq)
+            if prereq_index == -1:
+                # ignore combinations where not all prereqs have been placed
+                all_placed = False
+                break
+            else:
+                # make last_satisfied the last term index for all prereqs
+                last_satisfied = max(last_satisfied, prereq_index)
 
-    # Check to see if already placed
-    if checkPlaced(plan, course):
-        return
-    print(f"Placing {course}", end=' ')
-    courseObject = lookup(courses, course)
+        if all_placed:
+            # earliest placement is the term after the term where all the prereqs are satisfied
+            earliest_placement = last_satisfied + 1 if earliest_placement == -1 else min(earliest_placement, last_satisfied + 1)
 
-    # Extract information about last-placed prerequisite
-    lastIndex = lastPlaced(plan, course)
-    lastYear = lastIndex // 4 + 1
-    lastTerm = lastIndex % 4 + 1
+    # earliest placement should be one of the course term offerings
+    if earliest_placement == -1:
+        return -1
+    # keep increasing the earliest placement until it is one of the course term offerings
+    while earliest_placement % 4 not in course.terms:
+        earliest_placement += 1
+    return earliest_placement
 
-    # Course has no prequisites
-    if len(courseObject.pre) == 0:
-        lastYear = 1
-        lastTerm = -1
-    # Not all prerequisites placed
-    elif lastIndex == -1:
-        # Return to priority queue with less priority?
-        pq.put((-totalDependencies(prereqs, [], course) + 1, int(course[4]), course))
-        return
 
-    # Determine Year
-    for year in range(lastYear, 6):
-        # Determine Term
-        for offering in courseObject.term:
-            # Update logic below for co-requisites < instead of <=
-            if year == lastYear and offering <= lastTerm:
-                continue
-            # Check full
-            index = 4 * (year - 1) + (offering - 1)
-            if len(plan[index]) < planSize[index]:
-                print(f"into year {year + 1} term {offering}")
-                plan[index].append(course)
-                return
+def possible_insertion(plan, plan_specs, plan_index, course):
+    ''' Determines whether a course can be inserted for a given plan_index '''
+    current_uoc = sum(x.uoc for x in plan[plan_index])
+    return current_uoc + course.uoc <= plan_specs['max_uoc'][plan_index] and plan_index % 4 in course.terms
+
+
+def place_course(plan, plan_specs, selected_courses, course):
+    ''' Places a course in the plan '''
+    # already placed
+    if placed_index(plan, course) != -1:
+        return True
+    
+    # determine first possible index for placement
+    # print(f"Placing {course.code}", end=' ')
+    first_possible_index = first_possible_placement(plan, plan_specs, selected_courses, course)
+    if first_possible_index == -1:
+        return False
+    first_possible_year = first_possible_index // 4 # 0-indexed
+    first_possible_term = first_possible_index % 4
+
+    # course placement
+    year = first_possible_year
+    while True:
+        # find first possible year for placement
+        term = first_possible_term
+        while term < 4:
+            # find first possible term for placement
+            plan_index = 4 * year + term
+            if possible_insertion(plan, plan_specs, plan_index, course):
+                # print(f'into year {year + 1} term {term}')
+                # separate place into plan as a separate function - allocate more terms to plan if need be
+                plan[plan_index].append(course)
+                return True
+            term += 1
+        year += 1
+    return False # never reaches
 
 
 def main(selected_course_codes, plan, plan_specs):
@@ -78,7 +95,7 @@ def main(selected_course_codes, plan, plan_specs):
     selected_courses (list of Course objects)
     plan (arr)
     plan_specs (dict containing info about each term in plan)
-        e.g. max_uoc, term 0/1/2/3, 
+        e.g. max_uoc, term 0/1/2/3, starting term
     '''
     # filter relevant prerequisites
     selected_courses = {}
@@ -93,46 +110,81 @@ def main(selected_course_codes, plan, plan_specs):
     # set up a graph representing course prerequisites
     prereqs = Graph(selected_courses.values())
 
-
-    # calculate courses available in each term??
-    summer_courses = [course for course in selected_courses.values() if 0 in course.terms]
-    term_1_course = [course for course in selected_courses.values() if 1 in course.terms]
-    term_2_course = [course for course in selected_courses.values() if 2 in course.terms]
-    term_3_course = [course for course in selected_courses.values() if 3 in course.terms]
-
-
-
     # create a priority queue for course placement
-    # courses are represented and sorted by a tuple (total_dependencies, course_level, course_name)
+    # courses are represented and sorted by a tuple (total_dependencies, course_rarity, course_level, course_name)
+    # NOTE: rarity or level with more priority depending on optimisation (ease of difficulty or graduation time) !!
     # since the priority queue sorts by least priority, lower valued tuples have higher priority
     pq = queue.PriorityQueue()
+    placed_courses = set()
 
     # place courses with no prerequisites in priority queue first if other courses depend on it
     for course_code in prereqs.no_pre_courses:
         course = selected_courses[course_code]
         total_dependencies = prereqs.total_dependencies(course_code, {})
         if len(total_dependencies) > 0:
-            pq.put((-len(total_dependencies), course.level, course))  
+            pq.put((-len(total_dependencies), len(course.terms), course.level, course))
 
-    # place courses
+    # place courses from priority queue
     while not pq.empty():
-        course = pq.get()[2]
-        place()
-        for dependency_code in prereqs.immediate_dependencies(course.code):
-            dependency = selected_courses[dependency_code]
-            if not already_placed(plan, dependency): # course code or object??
-                total_dependencies = prereqs.total_dependencies(dependency_code, {})
-                pq.put((-len(total_dependencies), dependency.level, dependency))
+        # retrieve the course with the highest priority for placement
+        total_dependencies, rarity, level, course = pq.get()
+        # course already placed
+        if course in placed_courses:
+            continue
+        # course unable to be placed
+        if not place_course(plan, plan_specs, selected_courses, course):
+            # place it back in the priority queue with less priority if not placed (to prevent infinite loop)
+            pq.put((total_dependencies + 1, rarity, level, course))
+            place_course(plan, plan_specs, selected_courses, course)
+            continue
+        # course placed
+        placed_courses.add(course)
 
-    print(plan)
-    # calculate finishing term and total length
-    return {}
+        # add other courses once courses without prerequisites have been placed
+        if pq.empty():
+            unplaced_courses = set(selected_courses.values()) - placed_courses
+            for course in unplaced_courses:
+                total_dependencies = prereqs.total_dependencies(course.code, {})
+                pq.put((-len(total_dependencies), len(course.terms), course.level, course))
+
+
+    # information about plan
+    # finishing term - first term from end that is non-empty
+    finish_index = len(plan) - 1
+    while not plan[finish_index]:
+        finish_index -= 1
+    # study duration
+    total_study_terms = 0
+    start_index = finish_index
+    for term_index, term_courses in enumerate(plan[:finish_index + 1]):
+        if term_courses:
+            start_index = min(start_index, term_index)
+            total_study_terms += 1
+
+    # TEMPORARY:
+    plan = plan[:finish_index + 1]
+    for plan_index, term_courses in enumerate(plan):
+        print(f'Year {plan_index//4 + 1} Term {plan_index % 4}: {[course.code for course in term_courses]}')
+    print(f'Start: Year {start_index//4 + 1} Term {start_index % 4}')
+    print(f'Finish: Year {finish_index//4 + 1} Term {finish_index % 4}')
+    print(f'Terms of study: {total_study_terms} terms')
+    print(f'Total duration: {finish_index - start_index + 1} terms')
+
+    return {
+        'start_index': start_index,
+        'finish_index': finish_index,
+        'num_study_terms': total_study_terms,
+        'total_duration': finish_index - start_index + 1,
+        'plan': [[course.code for course in term_courses] for term_courses in plan],
+    }
 
 
 if __name__ == '__main__':
-    main([course.code for course in courses], plan, planSize)
+    main([course.code for course in courses], plan, plan_specs)
 
 ### Notes:
-# Maybe try to place courses with no-pres earlier in plan - easier, such as SCIF1131?
 # Consider both term offerings not just the first available option TODO
 # Find last placed course and don't write terms after it
+
+# A BACKTRACKING ALGORITHM MIGHT BE BETTER (sort by effiency, then practicality - level)
+# TERM PLACEMENT BASED ON TERM OFFERINGS OF OTHER COURSES (TERM RARITY? FROM OTHER COURSES?)

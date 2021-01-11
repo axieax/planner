@@ -31,6 +31,15 @@ class Course:
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.code == other.code)
     
+    def __lt__(self, other):
+        return (self.__class__ == other.__class__) and (self.code < other.code)
+
+    def __gt__(self, other):
+        return (self.__class__ == other.__class__) and (self.code > other.code)
+    
+    def num_prerequisites(self):
+        return sum(map(len, self.prereqs))
+    
     def prereq_complexity(self):
         # max depth
         # FILTER
@@ -61,7 +70,7 @@ class Vertex:
             num_pres: number of prereqs
         '''
         self.course = course
-        self.num_pres = sum(map(len, course.prereqs))
+        self.num_pres = course.num_prerequisites()
 
 
 # Graph Class
