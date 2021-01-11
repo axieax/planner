@@ -2,6 +2,8 @@ from util import Course, lookup, Vertex, Graph, queue
 from data import courses, plan, planSize
 import json
 
+# TODO: need to rewrite logic due to changing of Course structure
+
 
 # Counts the total number of courses that are dependent on specified course - not just immediate
 def totalDependencies(prereqs, counted, course):

@@ -1,21 +1,38 @@
 """
 Course ADT
 """
-# Course Class
 class Course:
-    def __init__(self, code, term, pre, uoc):
-        # Course code (string)
+    ''' Class for a Course '''
+    def __init__(self, code, terms, prereqs, uoc):
+        '''
+        Constructor method for a Course
+            code: course code (str) CCCCNNNN
+            terms: term offerings (list of ints - 0 (summer), 1, 2, 3)
+            prereqs: prerequisites (format described under prereq_parser, from str input)
+            uoc: units of credit (int)
+            level: first digit in course code (int)
+            exclusion: list of course codes (str) for exclusion courses
+        '''
         self.code = code
-        # Term offerings (list of numbers)
-        self.term = term
-        # Prerequisites (list of strings)
-        self.pre = pre
-        # Units of credit (int)
+        # name: course name (str)
+        # self.name = name
+        self.terms = terms
+        self.prereqs = prereq_parser(prereqs)
         self.uoc = uoc
+        self.level = code[4]
+        self.exclusion = [] # TODO
+    
+    def prereq_complexity(self):
+        # max depth
+        # FILTER
+        return max(map(len, self.prereqs))
+        return len(self.prereqs)
 
 
-# Course name lookup - returns Course object given course code if it exists
 def lookup(courses, check):
+    '''
+    Course name lookup - returns Course object given course code (str) if it exists
+    '''
     for course in courses:
         if course.code == check:
             return course
@@ -25,15 +42,21 @@ def lookup(courses, check):
 """
 Directed Graph ADT
 """
-# Vertex Class
 class Vertex:
+    ''' Class for a Vertex '''
     def __init__(self, course):
+        '''
+        Constructor method for a Vertex
+            course (Course object)
+            numPres: number of prereqs
+        '''
         self.course = course
         self.numPres = len(course.pre)
 
 
 # Graph Class
 class Graph:
+    ''' Class for a Graph '''
     def __init__(self, courses):
         self.numVertices = 0
         # Adjacency list representation of outgoing connections
@@ -74,6 +97,7 @@ Prerequisite Logic Parser
 import re
 const_symbols = ['and', 'or', '(', ')']
 
+
 def prereq_parser(prereq_string):
     '''
     Returns a 2D list of all possible combinations (topmost OR) for a prereq_string
@@ -87,7 +111,8 @@ def prereq_parser(prereq_string):
         # find last opening bracket (first occurence in reversed string)
         last_open = len(prereqs) - prereqs[::-1].index('(') - 1
         # evaluate to first closing bracket
-        first_close = last_open + prereqs[last_open:].index(')') # could raise ValueError if ')' does not exist - bad logic
+        # could raise ValueError if ')' does not exist - bad logic
+        first_close = last_open + prereqs[last_open:].index(')')
         # simply prereq logic in brackets
         bracket_prereqs = prereqs[last_open + 1: first_close]
         bracket_prereqs = prereq_parser_simple(bracket_prereqs)
@@ -95,7 +120,7 @@ def prereq_parser(prereq_string):
         for _ in range(first_close - last_open + 1):
             prereqs.pop(last_open)
         prereqs.insert(last_open, bracket_prereqs)
-    
+
     return prereq_parser_simple(prereqs)
 
 
@@ -151,7 +176,7 @@ def list_and_join(prereqs_list):
                 before = prereqs_list[:prereqs_index]
                 curr = [[option]]
                 after = prereqs_list[prereqs_index + 1:]
-                
+
                 # [[['a'], ['b']], [['c', 'd']]] => [[['a']], [['c', 'd']]] OR [[['b']], [['c', 'd']]]
                 new = []
                 if prereqs_index > 0:
@@ -161,7 +186,7 @@ def list_and_join(prereqs_list):
                 if prereqs_index < len(prereqs_list) - 1:
                     # include prereqs after the prereqs with multiple options if they exist
                     new.append(after)
-                
+
                 ans.append(list_and_join(flatten_lists(new)))
             linear = False
 
@@ -181,4 +206,3 @@ def list_and_join(prereqs_list):
 
 def flatten_lists(lists):
     return sum(lists, [])
-

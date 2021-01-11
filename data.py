@@ -21,125 +21,93 @@ from util import Course
 courses = []
 
 ### Course Options ###
-# Y1T1
-comp1511 = Course("COMP1511", [1, 2, 3], [], 6)
-math1081 = Course("MATH1081", [1, 2, 3], [], 6) # Co-requisite with 1141
-math1141 = Course("MATH1141", [1, 3], [], 6)
-# Y1T2
-comp2521 = Course("COMP2521", [1, 2, 3], ["COMP1511"], 6)
-data1001 = Course("DATA1001", [2], [], 6)
-math1241 = Course("MATH1241", [1, 2], ["MATH1141"], 6)
-# Y1T3
-comp1521 = Course("COMP1521", [2, 3], ["COMP1511"], 6)
-comp1531 = Course("COMP1531", [1, 3], ["COMP1511"], 6)
-math2621 = Course("MATH2621", [3], ["MATH1241"], 6)
-# Y2T1
-comp3411 = Course("COMP3411", [4, 1], ["COMP2521"], 6)
-comp3821 = Course("COMP3821", [1], ["COMP2521"], 6)
-math2111 = Course("MATH2111", [1], ["MATH1241"], 6)
-# Y2T2
-comp2511 = Course("COMP2511", [2, 3], ["COMP1531", "COMP2521"], 6)
-math2601 = Course("MATH2601", [2], ["MATH1241"], 6)
-math2901 = Course("MATH2901", [2], ["MATH1241"], 6)
-# Y2T3
-math2931 = Course("MATH2931", [3], ["MATH2901"], 6)
-scif1131 = Course("SCIF1131", [1, 3], [], 6)
-comp3311 = Course("COMP3311", [1, 3], ["COMP2521"], 6)
-# Y3T1
-math3901 = Course("MATH3901", [1], ["MATH2901", "MATH2601", "MATH2111"], 6)
-math3911 = Course("MATH3911", [1], ["MATH2931"], 6)
+# currently have to manually remove mark requirements
+# UNDERGRAD COURSES
+# re to extract from after 'Prerequisite: ' to newline or fullstop
+''' DATA '''
+data1001 = Course('DATA1001', [2], '', 6)
 
-# Y3T2
-math3821 = Course("MATH3821", [2], ["MATH2931"], 6)
+''' SCIF '''
+scif1131 = Course('SCIF1131', [1, 3], '', 6)
+scif3199 = Course('SCIF3199', [0, 1, 2, 3], '48 units of credit', 6) # found under 'conditions for enrolment'
+
+''' ENGG '''
+engg2600 = Course('ENGG2600', [1, 2, 3], '??', 2) # !!!
+
+''' PSYC '''
+psyc1001 = Course('PSYC1001', [1, 2], '', 6)
+
+''' COMP '''
+comp1511 = Course('COMP1511', [1, 2, 3], '', 6)
+comp2521 = Course('COMP2521', [1, 2, 3], 'COMP1511 or DPST1091 or COMP1917 or COMP1921', 6)
+comp1521 = Course('COMP1521', [2, 3], 'COMP1511 or DPST1091 or COMP1911 or COMP1917', 6)
+comp1531 = Course('COMP1531', [1, 3], 'COMP1511 or DPST1091 or COMP1917 or COMP1921', 6)
+comp2511 = Course('COMP2511', [2, 3], 'COMP1531 AND (COMP2521 OR COMP1927)', 6)
+comp3121 = Course('COMP3121', [2, 3], 'COMP1927 or COMP2521', 6)
+comp3231 = Course('COMP3231', [1], '(COMP1521 or DPST1092 or COMP2121 or ELEC2142) and (COMP2521 or COMP1927)', 6)
+comp3311 = Course('COMP3311', [1, 3], 'COMP2521 or COMP1927', 6)
+comp3411 = Course('COMP3411', [0, 1], 'COMP2521 or COMP1927', 6)
+comp3900 = Course('COMP3900', [1, 2, 3], 'COMP1531, and COMP2521 or COMP1927, and enrolled in a BSc Computer Science major with completion of 102 uoc', 6)
+comp4418 = Course('COMP4418', [3], 'COMP3411', 6)
+comp4920 = Course('COMP4920', [3], '(COMP2511 or COMP2911) and completion of 96 UOC in Computer Science.', 6)
+comp6841 = Course('COMP6841', [1], 'Completion of 48 UOC, and COMP1927 or COMP2521') # !!!
+comp9318 = Course('COMP9318', [1], '(COMP2521 or COMP1927) and COMP3311 and MATH1081', 6)
+comp9417 = Course('COMP9417', [1, 2], '(MATH1081 and (COMP1531 or COMP2041)) or (COMP1927 or COMP2521)', 6) # determine which comes first
+comp9418 = Course('COMP9418', [3], 'COMP9417', 6)
+comp9444 = Course('COMP9444', [2, 3], 'COMP1927 or COMP2521 or MTRN3500', 6)
+
+''' MATH '''
+math1081 = Course('MATH1081', [1, 2, 3], '', 6) # Co-requisite with 1141
+math1141 = Course('MATH1141', [1, 3], '', 6)
+math1241 = Course('MATH1241', [1, 2], 'MATH1131 or MATH1141 or DPST1013', 6)
+math2111 = Course('MATH2111', [1], 'MATH1231 or DPST1014 or MATH1241 or MATH1251', 6)
+math2601 = Course('MATH2601', [2], 'MATH1231 or DPST1014 or MATH1241 or MATH1251', 6)
+math2621 = Course('MATH2621', [3], 'MATH1231 or DPST1014 or MATH1241 or MATH1251', 6)
+math2901 = Course('MATH2901', [2], 'MATH1231 or MATH1241 or MATH1251 or DPST1014', 6)
+math2931 = Course('MATH2931', [3], 'MATH2901 or MATH2801', 6)
+math3411 = Course('MATH3411', [1, 3], 'MATH1081 or MATH1231(CR) or DPST1014 (CR) or MATH1241(CR) or MATH1251(CR) or MATH2099', 6)
+math3521 = Course('MATH3521', [1], '12 units of credit in Level 2 Math courses', 6) # under conditions for enrolment
+math3821 = Course('MATH3821', [2], 'MATH2831 or MATH2931', 6)
+math3871 = Course('MATH3871', [3], 'MATH2801 or MATH2901', 6)
+math3901 = Course('MATH3901', [1], 'MATH2901 or MATH2801(DN) and MATH2501 or MATH2601 and MATH2011 or MATH2111 or MATH2510 or MATH2610', 6) # BAD LOGIC
+math3911 = Course('MATH3911', [1], 'MATH2931 or MATH2831', 6)
 
 
-# Possible
-comp9318 = Course("COMP9318", [1], ["COMP2521", "COMP3311", "MATH1081"], 6)
-comp9417 = Course("COMP9417", [1, 2], ["COMP2521"], 6)
-# comp9417 = Course("COMP9417", [1, 2], ["MATH1081", "COMP1531"], 6) # Determine which comes first
-comp9444 = Course("COMP9444", [2, 3], ["COMP2521"], 6)
-
-
-# 3781 2020 Version
+# 3789 2021 Version
 
 ### Selected Options ###
-
-""" Computer Science (96) """
-# Artificial Intelligence Major (78)
-# Core (72 - 18 = 54)
 courses.append(comp1511)
-courses.append(comp1521)
-courses.append(comp1531)
-courses.append(comp2511)
-courses.append(comp2521)
-courses.append(comp3411)
-courses.append(comp3821)
-# courses.append(comp3900) cs project
-# courses.append(comp4920) ethics
-
-# Artificial Intelligence Prescribed Electives (18)
-courses.append(comp9318)
-courses.append(comp9417)
-courses.append(comp9444)
-
-# Lvl 3|4|6|9 Computing Elective (6) - 2021 version includes VIP projects
-courses.append(comp3311)
-
-
-""" Advanced Mathematics (138) """
-# Level 1 Core Course (6)
-courses.append(scif1131)
-
-# Advanced Statistics (78)
-# Level 1 Core Courses (18)
 courses.append(math1081)
 courses.append(math1141)
-courses.append(math1241)
-
-# Level 2 Core Courses (30)
-courses.append(math2111)
-courses.append(math2601)
-courses.append(math2621)
-courses.append(math2901)
-courses.append(math2931)
-
-# Level 3 Core Courses (24)
-courses.append(math3821)
-courses.append(math3901)
-courses.append(math3911)
-pass
-
-# Level 3 Prescribed Electives (6)
-pass
-
-# Level 1 Computer Science Elective Requirement (met - 6)
-
-
-# Honours (48)
-# Core Courses (30)
-pass
-pass
-pass
-pass
-pass
-
-# Thesis Courses (18)
-pass
-pass
-pass
-
-
-""" Makeup Electives """
-# Duplicate Mathematics (18)
-pass
-pass
-pass
-
-# Level 1 Computer Science Elective Requirement under Mathematics (6)
-pass
-
-# Science Elective for Advanced Statistics (6)
 courses.append(data1001)
+courses.append(comp2521)
+courses.append(math1241)
+courses.append(comp1521)
+courses.append(comp1531)
+courses.append(math2621)
+courses.append(comp3411)
+courses.append(comp6841)
+courses.append(math2111)
+courses.append(engg2600) # * 3
+courses.append(comp3121)
+courses.append(math2601)
+courses.append(math2901)
+courses.append(comp4418)
+courses.append(math2931)
+courses.append(math3411)
+courses.append(psyc1001)
+courses.append(comp9417)
+courses.append(math3911)
+courses.append(comp2511)
+courses.append(comp9444)
+courses.append(math3821)
+courses.append(comp3900)
+courses.append(comp4920)
+courses.append(math3871)
+courses.append(scif3199)
+courses.append(comp3231)
+courses.append(math3521)
+courses.append(math3901)
 
 
 """
@@ -154,6 +122,7 @@ planSize = [3 for i in range(len(courses))]
 
 """
 Front end design:
+    Course selection --> Degree plan
     Bundle courses by category
     Ensure all prerequisites are selected - select prerequisites as well automatically
     Drag and drop interface for pre-planned
