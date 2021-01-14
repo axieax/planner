@@ -1,9 +1,9 @@
 import json
-from util import Course, lookup, Vertex, Graph, queue
+from util import Course, lookup, Vertex, Graph, PriorityQueue
 from data import courses, plan, plan_specs, all_courses
 from util import relevant_prereqs_filter
 
-DEBUG = True
+DEBUG = False
 NUM_TERMS = 4
 # default specs
 
@@ -25,7 +25,11 @@ def first_possible_placement(plan, plan_specs, selected_courses, course):
     # NOTE: co-requisite (first_possible_index could be earlier)
     
     # courses without prerequisites can be placed anytime
-    earliest_placement = plan_specs['starting_term'] if course.num_prerequisites() == 0 else -1
+    if course.num_prerequisites() == 0:
+        return plan_specs['starting_term']
+    
+    # find earliest placement
+    earliest_placement = -1
     for comb in course.prereqs:
         # find the last term index where all the prerequisites are satisfied
         last_satisfied = -1
@@ -58,7 +62,9 @@ def first_possible_placement(plan, plan_specs, selected_courses, course):
 def possible_insertion(plan, plan_specs, plan_index, course):
     ''' Determines whether a course can be inserted for a given plan_index '''
     current_uoc = sum(x.uoc for x in plan[plan_index])
-    return current_uoc + course.uoc <= plan_specs['max_uoc'][plan_index] and plan_index % NUM_TERMS in course.terms
+    uoc_check = (current_uoc + course.uoc <= plan_specs['max_uoc'][plan_index])
+    term_check = (plan_index % NUM_TERMS in course.terms)
+    return uoc_check and term_check
 
 
 def place_course(plan, plan_specs, selected_courses, course):
@@ -93,7 +99,6 @@ def place_course(plan, plan_specs, selected_courses, course):
                 plan[plan_index].append(course)
                 return True
         year += 1
-    return False # never reaches
 
 
 def main(selected_course_codes, plan, plan_specs):
@@ -109,9 +114,9 @@ def main(selected_course_codes, plan, plan_specs):
         # retrieve course data
         original_course = all_courses[course_code]
         # filter prerequisites, keeping those relevant to the selected courses
-        new_course = Course(course_code, original_course.terms, '', original_course.uoc)
-        new_course.prereqs = relevant_prereqs_filter(selected_course_codes, original_course) # getter and setter
-        selected_courses[course_code] = new_course
+        filter_course = Course(course_code, original_course.terms, '', original_course.uoc)
+        filter_course.prereqs = relevant_prereqs_filter(selected_course_codes, original_course) # use getter and setter, or this function returns new Course object?
+        selected_courses[course_code] = filter_course
     
     # set up a graph representing course prerequisites
     prereqs = Graph(selected_courses.values())
@@ -119,26 +124,25 @@ def main(selected_course_codes, plan, plan_specs):
     # create a priority queue for course placement
     # courses are represented and sorted by a tuple (total_dependencies, course_rarity, course_level, course_name)
     # since the priority queue sorts by least priority, lower valued tuples have higher priority
-    pq = queue.PriorityQueue()
+    pq = PriorityQueue()
     placed_courses = set()
 
     # place courses into priority queue
     for course in selected_courses.values():
-        total_dependencies = prereqs.total_dependencies(course.code, {})
-        pq.put((-len(total_dependencies), len(course.terms), course.level, course))
+        pq.push(prereqs, course)
 
     # place courses from priority queue
     while not pq.empty():
         # retrieve the course with the highest priority for placement
-        total_dependencies, rarity, level, course = pq.get()
+        course, priority_summary = pq.pop()
         # course already placed
         if course in placed_courses:
             continue
         # course unable to be placed
         if not place_course(plan, plan_specs, selected_courses, course):
             # place it back in the priority queue with less priority if not placed (to prevent infinite loop)
-            pq.put((total_dependencies + 1, rarity, level, course))
-            place_course(plan, plan_specs, selected_courses, course)
+            new_dependency_score = priority_summary['dependency_score'] - 1
+            pq.push(prereqs, course, dependency_score=new_dependency_score)
             continue
         # course placed
         placed_courses.add(course)

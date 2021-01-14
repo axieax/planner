@@ -22,6 +22,16 @@ class Course:
         self.level = int(code[4])
         self.exclusion = [] # TODO
 
+    def priority(self, prereqs, **corrections):
+        '''
+        Returns the priority score tuple calculated for a Course object
+        '''
+        # high = more priority
+        dependency_score = corrections.get('dependency_score', len(prereqs.total_dependencies(self.code, {})))
+        course_rarity = corrections.get('course_rarity', -len(self.terms))
+        course_level = corrections.get('course_level', -self.level)
+        return dependency_score, course_rarity, course_level
+
     def __repr__(self):
         return f'{self.code} - {prereqs_expression(self.prereqs)}'
     
@@ -39,12 +49,6 @@ class Course:
     
     def num_prerequisites(self):
         return sum(map(len, self.prereqs))
-    
-    def prereq_complexity(self):
-        # max depth
-        # FILTER
-        return max(map(len, self.prereqs))
-        return len(self.prereqs)
 
 
 def lookup(courses, check):
@@ -126,6 +130,34 @@ class Graph:
 Queue ADT
 """
 import queue
+
+class PriorityQueue(queue.PriorityQueue):
+    '''
+    Custom wrapper for queue.PriorityQueue, inheriting most functionality. However, for the
+    interface: the highest priority item/Course object has the highest priority score tuple
+    rather than the lowest tuple (as in the original class)
+    '''
+    def __init__(self):
+        ''' Constructor method '''
+        super().__init__()
+
+    def push(self, prereqs, course, **priority_corrections):
+        '''
+        Adds a Course object to the priority queue. Its priority is calculated using
+        the given prereqs (Graph), and optional corrections may be provided
+        '''
+        dependency_score, course_rarity, course_level = course.priority(prereqs, **priority_corrections)
+        new_tuple = (-dependency_score, -course_rarity, -course_level, course)
+        super().put(new_tuple)
+
+    def pop(self):
+        dependency_score, course_rarity, course_level, course = super().get()
+        priority_summary = {
+            'dependency_score': -dependency_score,
+            'course_rarity': -course_rarity,
+            'course_level': -course_level,
+        }
+        return course, priority_summary
 
 
 """
@@ -252,6 +284,7 @@ def flatten_lists(lists):
 
 def relevant_prereqs_filter(selected_course_codes, course):
     ''' Returns a list of relevant prereqs for the selected courses (list of strings) '''
+    # NOTE: return a new Course object with these prereqs?
     return [comb for comb in course.prereqs if all([prereq in selected_course_codes for prereq in comb])]
 
 def prereqs_expression(prereqs):
