@@ -47,15 +47,15 @@ class Course:
 
     def __eq__(self, other):
         ''' Equality comparison between two Course objects for priority queue comparison purposes '''
-        return (self.__class__ == other.__class__) and (self.code == other.code)
+        return self.code == other.code
     
     def __lt__(self, other):
         ''' Less than comparison between two Course objects for priority queue comparison purposes '''
-        return (self.__class__ == other.__class__) and (self.code < other.code)
+        return self.code < other.code
 
     def __gt__(self, other):
         ''' Greater than comparison between two Course objects for priority queue comparison purposes '''
-        return (self.__class__ == other.__class__) and (self.code > other.code)
+        return self.code > other.code
 
 
 """
