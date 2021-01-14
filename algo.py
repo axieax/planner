@@ -1,5 +1,5 @@
 import json
-from util import Course, lookup, Vertex, Graph, PriorityQueue
+from util import Course, Graph, PriorityQueue
 from data import courses, plan, plan_specs, all_courses
 from util import relevant_prereqs_filter
 
@@ -7,9 +7,21 @@ DEBUG = False
 NUM_TERMS = 4
 # default specs
 
+def course_lookup(selected_courses, course_code):
+    '''
+    Returns the Course object in selected_courses (list) with the given course_code (str).
+    Returns None if unable to find the course.
+    '''
+    for course in selected_courses:
+        if course.code == course_code:
+            return course
+    return None
+
+
 def placed_index(plan, course):
     '''
-    Finds the index where a course has been placed in the plan, returning -1 if unable to
+    Returns the plan index (int) where a Course object has been placed in the plan (list of lists).
+    Returns -1 if course is not placed in the plan.
     '''
     for plan_index, term_courses in enumerate(plan):
         if course in term_courses:
@@ -19,15 +31,15 @@ def placed_index(plan, course):
 
 def first_possible_placement(plan, plan_specs, selected_courses, course):
     '''
-    Returns the first possible term index in the given plan where a course can be placed
-    -1 if prerequisites cannot be satisfied
+    Returns the first possible term index (int) in the given plan (list of lists) with plan_specs (dict)
+    where a Course object can be placed. Returns -1 if its prerequisites cannot be satisfied.
     '''
-    # NOTE: co-requisite (first_possible_index could be earlier)
-    
+    # TODO: co-requisite (first_possible_index could be earlier)
+
     # courses without prerequisites can be placed anytime
     if course.num_prerequisites() == 0:
         return plan_specs['starting_term']
-    
+
     # find earliest placement
     earliest_placement = -1
     for comb in course.prereqs:
@@ -36,7 +48,7 @@ def first_possible_placement(plan, plan_specs, selected_courses, course):
         all_placed = True
         for prereq_code in comb:
             # retrieve information about prerequisite
-            prereq = selected_courses[prereq_code]
+            prereq = course_lookup(selected_courses, prereq_code)
             prereq_index = placed_index(plan, prereq)
             if prereq_index == -1:
                 # ignore combinations where not all prereqs have been placed
@@ -60,15 +72,27 @@ def first_possible_placement(plan, plan_specs, selected_courses, course):
 
 
 def possible_insertion(plan, plan_specs, plan_index, course):
-    ''' Determines whether a course can be inserted for a given plan_index '''
+    '''
+    Determines whether a Course object can be inserted for a given plan_index (int)
+    in the plan (list of lists) with plan_specs (dict).
+    '''
+    # uoc check
     current_uoc = sum(x.uoc for x in plan[plan_index])
-    uoc_check = (current_uoc + course.uoc <= plan_specs['max_uoc'][plan_index])
-    term_check = (plan_index % NUM_TERMS in course.terms)
-    return uoc_check and term_check
+    if current_uoc + course.uoc > plan_specs['max_uoc'][plan_index]:
+        return False
+    # term offering check
+    plan_term = plan_index % NUM_TERMS
+    if plan_term not in course.terms:
+        return False
+    return True
 
 
 def place_course(plan, plan_specs, selected_courses, course):
-    ''' Places a course into the plan '''
+    '''
+    Places a Course object into the plan (list of lists) with plan_specs (dict).
+    selected_courses (list of Course objects) is passed onto first_possible_placement.
+    Returns True if able to successfully place the course, False otherwise.
+    '''
     if DEBUG:
         print(f'Placing {course.code}', end=' ')
 
@@ -103,32 +127,40 @@ def place_course(plan, plan_specs, selected_courses, course):
 
 def main(selected_course_codes, plan, plan_specs):
     '''
-    selected_courses (list of Course objects)
-    plan (arr)
-    plan_specs (dict containing info about each term in plan)
-        e.g. max_uoc, term 0/1/2/3, starting term
+    Main algorithm for creating a plan for the provided courses
+    Input:
+        selected_courses_codes (list of str)
+        plan (list)
+        plan_specs (dict containing plan info)
+            starting_term (int)
+            max_uoc: maximum uoc for each term (list of int)
+    Output dict:
+        plan: filled in with course codes (list)
+        start_index: index in plan where the first term start (int)
+        finish_index: index in plan where the last term ends (int)
+        num_study_terms: number of terms in the plan with classes (int),
+        total_duration: number of terms in the plan (int)
     '''
     # filter relevant prerequisites
-    selected_courses = {}
+    selected_courses = []
     for course_code in selected_course_codes:
         # retrieve course data
         original_course = all_courses[course_code]
         # filter prerequisites, keeping those relevant to the selected courses
         filter_course = Course(course_code, original_course.terms, '', original_course.uoc)
         filter_course.prereqs = relevant_prereqs_filter(selected_course_codes, original_course) # use getter and setter, or this function returns new Course object?
-        selected_courses[course_code] = filter_course
+        selected_courses.append(filter_course)
     
     # set up a graph representing course prerequisites
-    prereqs = Graph(selected_courses.values())
+    prereqs = Graph(selected_courses)
 
     # create a priority queue for course placement
-    # courses are represented and sorted by a tuple (total_dependencies, course_rarity, course_level, course_name)
-    # since the priority queue sorts by least priority, lower valued tuples have higher priority
+    # level of importance for course priority: dependency_score, course_rarity and course_level
     pq = PriorityQueue()
     placed_courses = set()
 
     # place courses into priority queue
-    for course in selected_courses.values():
+    for course in selected_courses:
         pq.push(prereqs, course)
 
     # place courses from priority queue
@@ -168,7 +200,7 @@ def main(selected_course_codes, plan, plan_specs):
     print(f'Start: Year {start_index//NUM_TERMS + 1} Term {start_index % NUM_TERMS}')
     print(f'Finish: Year {finish_index//NUM_TERMS + 1} Term {finish_index % NUM_TERMS}')
     print(f'Terms of study: {total_study_terms} terms')
-    print(f'Total duration: {finish_index - start_index + 1} terms')
+    print(f'Total duration: {(finish_index - start_index + 1) // NUM_TERMS} years and {(finish_index - start_index + 1) % NUM_TERMS} terms; or {finish_index - start_index + 1} total terms')
 
     return {
         'start_index': start_index,

@@ -6,7 +6,7 @@ class Course:
     def __init__(self, code, terms, prereqs, uoc):
         '''
         Constructor method for a Course
-            code: course code (str) CCCCNNNN
+            code: course code (str) CCCCNNNN - stored in lowercase
             terms: term offerings (list of ints - 0 (summer), 1, 2, 3)
             prereqs: prerequisites (format described under prereqs_parser, from str input)
             uoc: units of credit (int)
@@ -14,91 +14,72 @@ class Course:
             exclusion: list of course codes (str) for exclusion courses
         '''
         self.code = code.lower()
-        # name: course name (str)
-        # self.name = name
         self.terms = terms
         self.prereqs = prereqs_parser(prereqs)
         self.uoc = uoc
         self.level = int(code[4])
         self.exclusion = [] # TODO
 
+    def num_prerequisites(self):
+        ''' Returns the number of unique prerequisite courses for a Course object '''
+        prereqs = set()
+        for comb in self.prereqs:
+            prereqs |= set(comb)
+        return len(prereqs)
+
     def priority(self, prereqs, **corrections):
         '''
-        Returns the priority score tuple calculated for a Course object
+        Returns the priority score tuple (dependency_score, course_rarity, course_level) calculated for a Course object
         '''
-        # high = more priority
+        # NOTE: higher tuple = more priority
         dependency_score = corrections.get('dependency_score', len(prereqs.total_dependencies(self.code, {})))
         course_rarity = corrections.get('course_rarity', -len(self.terms))
         course_level = corrections.get('course_level', -self.level)
         return dependency_score, course_rarity, course_level
 
     def __repr__(self):
+        ''' Representation of a Course object for debugging purposes '''
         return f'{self.code} - {prereqs_expression(self.prereqs)}'
     
     def __hash__(self):
+        ''' Hash of a Course object for priority queue comparison purposes '''
         return hash(self.code)
 
     def __eq__(self, other):
+        ''' Equality comparison between two Course objects for priority queue comparison purposes '''
         return (self.__class__ == other.__class__) and (self.code == other.code)
     
     def __lt__(self, other):
+        ''' Less than comparison between two Course objects for priority queue comparison purposes '''
         return (self.__class__ == other.__class__) and (self.code < other.code)
 
     def __gt__(self, other):
+        ''' Greater than comparison between two Course objects for priority queue comparison purposes '''
         return (self.__class__ == other.__class__) and (self.code > other.code)
-    
-    def num_prerequisites(self):
-        return sum(map(len, self.prereqs))
-
-
-def lookup(courses, check):
-    '''
-    Course name lookup - returns Course object given course code (str) if it exists
-    '''
-    # TODO: COURSES: MY COURSES OR ALL COURSES?
-    for course in courses:
-        if course.code.lower() == check.lower(): # lower case
-            return course
-    return None
 
 
 """
 Directed Graph ADT
 """
-class Vertex:
-    ''' Class for a Vertex '''
-    def __init__(self, course):
-        '''
-        Constructor method for a Vertex
-            course (Course object)
-            num_pres: number of prereqs
-        '''
-        self.course = course
-        self.num_pres = course.num_prerequisites()
-
-
-# Graph Class
 class Graph:
     ''' Class for a Graph '''
     def __init__(self, courses):
         '''
-        Constructor method for a Directed Graph
+        Constructor method for a Graph
             courses (list of Course objects)
             num_vertices (int)
             connections (adjacency list representation of outgoing connections)
-            no_pre_courses (list of Course objects without any prerequisites)
+            no_pre_courses (list of course_codes (str) without any prerequisites)
         '''
         self.num_vertices = len(courses)
-        # Adjacency list representation of outgoing connections
         self.no_pre_courses = []
         self.connections = {course.code: [] for course in courses}
         self.connections_setup(courses)
 
     def connections_setup(self, courses):
-        ''' Set up prerequisite connections '''
+        ''' Sets up prerequisite connections for the Graph, taking in courses (list of Course objects) '''
         for course in courses:
-            node = Vertex(course)
-            if node.num_pres == 0:
+            if course.num_prerequisites() == 0:
                 self.no_pre_courses.append(course.code)
             else:
                 for comb in course.prereqs:
@@ -108,20 +89,23 @@ class Graph:
 
     def immediate_dependencies(self, course_code):
         '''
-        Returns the courses that have the given course_code as an immediate prerequisite
+        Returns a list of codes (str) for courses that have the given course_code (str) as an immediate prerequisite
         '''
         return self.connections[course_code]
 
     def total_dependencies(self, course_code, memo):
         '''
-        Returns all the course_codes that depend on the given course_code as a prerequisite at some point
-        using a depth first search (dfs) algorithm
+        Returns a list of codes (str) for courses that depend on the given course_code (str)
+        as a prerequisite at some point using a depth first search (dfs) algorithm
         '''
         dependencies = []
+        # for each course that has the given course_code as a prerequisite 
         for dependency_code in self.immediate_dependencies(course_code):
             if dependency_code not in memo:
+                # add itself as a dependency
                 dependencies.append(dependency_code)
                 memo[dependency_code] = True
+                # as well as other courses that have it as a prerequisite (recursion)
                 dependencies += self.total_dependencies(dependency_code, memo)
         return dependencies
 
@@ -130,7 +114,6 @@ class Graph:
 Queue ADT
 """
 import queue
-
 class PriorityQueue(queue.PriorityQueue):
     '''
     Custom wrapper for queue.PriorityQueue, inheriting most functionality. However, for the
@@ -151,6 +134,10 @@ class PriorityQueue(queue.PriorityQueue):
         super().put(new_tuple)
 
     def pop(self):
+        '''
+        Removes the Course object with the highest priority from the priority queue.
+        Returns the Course object and a summary (dict) of its priority
+        '''
         dependency_score, course_rarity, course_level, course = super().get()
         priority_summary = {
             'dependency_score': -dependency_score,
