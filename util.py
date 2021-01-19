@@ -247,7 +247,7 @@ def prereqs_parser(prereqs_string):
 
         if linear:
             # all prereqs in prereqs_list have a single option (no OR logic)
-            # join all the prerequisite courses in the prereqs by AND logic
+            # join all the prerequisite courses in the prereqs by AND logic - associative logic law
             return [[prereq for prereqs in prereqs_list for prereq in prereqs[0]]]
         else:
             # prereqs_list provided contains prereqs with multiple options
