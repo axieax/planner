@@ -5,10 +5,12 @@ def test_null():
     assert prereqs_parser('') == []
 
 def test_invalid():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         prereqs_parser('a and b or c')
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         prereqs_parser('a or b and c')
+    with pytest.raises(ValueError):
+        prereqs_parser('(a and b or c')
 
 def test_single():
     # use Hypothesis testing
@@ -37,6 +39,9 @@ def test_simple_combination():
 
 def test_complex_combination():
     assert len(prereqs_parser('(a or b or c or d) and (e or f)')) == 4 * 2
+    assert len(prereqs_parser('(a or b) and (c or d) and (e or f)')) == 2 * 2 * 2
+    assert len(prereqs_parser('(a or b) and (c or d) and e and f')) == 2 * 2
+    assert len(prereqs_parser('(a or b) and (c and d) and (e or f)')) == 2 * 2
 
 def test_courses():
     # comp1511
@@ -45,6 +50,10 @@ def test_courses():
     # with my courses filter => [['comp1511']]
 
     cs9417 = prereqs_parser('(comp2521 and comp1531) or comp2521') == [['comp2521', 'comp1531'], ['comp2521']]
+
+
+def test_duplicate():
+    pass
 
 def test_relevant_filter():
     pass

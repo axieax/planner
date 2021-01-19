@@ -151,122 +151,116 @@ class PriorityQueue(queue.PriorityQueue):
 Prerequisite Logic Parser
 """
 import re
-const_symbols = ['and', 'or', '(', ')']
 
 def prereqs_parser(prereqs_string):
     '''
-    Returns a 2D list of all possible combinations (topmost OR) for a prereqs_string
-    where each combination is represented by a list (AND) of prerequisite courses
-    e.g. [['a', 'b'], 'c'] represents '(a and b) or c'
+    Returns a 2D list representation for the given prerequisites string in the PREREQS FORMAT.
+    PREREQS FORMAT:
+    A list of all possible combinations (topmost OR), where each combination is also
+    represented by a list (pairwise AND) of prerequisite courses.
+    e.g. [['a', 'b'], ['c']] represents '(a and b) or c'
     '''
-    prereqs = prereqs_str_to_list(prereqs_string)
 
-    # evaluate brackets first
-    while '(' in prereqs:
-        # find last opening bracket (first occurence in reversed string)
-        last_open = len(prereqs) - prereqs[::-1].index('(') - 1
-        # evaluate to first closing bracket
-        # could raise ValueError if ')' does not exist - bad logic
-        first_close = last_open + prereqs[last_open:].index(')')
-        # simply prereq logic in brackets
-        bracket_prereqs = prereqs[last_open + 1: first_close]
-        bracket_prereqs = prereqs_parser_simple(bracket_prereqs)
-        # update prereqs by replacing bracket logic
-        for _ in range(first_close - last_open + 1):
-            prereqs.pop(last_open)
-        prereqs.insert(last_open, bracket_prereqs)
+    def logic_parser(prereqs):
+        '''
+        Simplifies the list representation of the prerequisite string into the PREREQS FORMAT
+        Input: prereqs (list with prerequisite courses as a 2D list in the PREREQS FORMAT, and may include keywords)
+                   e.g. ['(', [['a']], 'or', [['b']], ')', 'and', [['c']]]
+        Output: 2D list in the PREREQS FORMAT
+        '''
+        # evaluate brackets first
+        while '(' in prereqs:
+            # find last opening bracket (first occurence in reversed string)
+            last_open = len(prereqs) - prereqs[::-1].index('(') - 1
+            # try to evaluate to first closing bracket
+            try:
+                first_close = last_open + prereqs[last_open:].index(')')
+            except ValueError:
+                raise ValueError('Bad logic')
+            # simply prereq logic in brackets
+            before = prereqs[:last_open]
+            inside = prereqs[last_open + 1: first_close]
+            after = prereqs[first_close + 1:]
+            # update prereqs by replacing bracket logic
+            prereqs = before + [logic_parser_simple(inside)] + after
 
-    return prereqs_parser_simple(prereqs)
+        return logic_parser_simple(prereqs)
 
 
-def prereqs_str_to_list(prereqs_string):
-    '''
-    Converts the prereq string input to list format (with prerequisite courses as a 2d list)
-    e.g. 'a and (b or c)' => [[['a']], 'and', '(', [['b']], 'or', [['c']], ')']
-    '''
-    prereqs_string = prereqs_string.lower()
+    def logic_parser_simple(prereqs):
+        '''
+        Simple parser that assumes there are no brackets in the input. Joins a list of PREREQS FORMAT 2D lists,
+        separated by logic operational keywords (AND, OR), into a single 2D list in the PREREQS format.
+        Input: prereqs (list with prerequisite courses as a 2D list in the PREREQS FORMAT, and may include keywords)
+        Output: 2D list in the PREREQS FORMAT
+        e.g. [[['a']], 'and', [['b']], 'and', [['c']]] => [['a', 'b', 'c']]
+        e.g. [[['a', 'b']], 'or', [['c']]] => [['a', 'b'], ['c']]
+        '''
+        if not prereqs:
+            # no prereqs provided
+            return []
+        elif 'and' in prereqs and 'or' in prereqs:
+            # e.g. cannot understand 'a and b or c' (without brackets)
+            raise ValueError('Bad logic')
+        elif 'and' in prereqs:
+            # remove 'and' keyword and compute new prereqs accordingly
+            return prereqs_and_join([x for x in prereqs if x != 'and'])
+        else:
+            # remove 'or' keyword and compute new prereqs accordingly
+            return flatten_lists([x for x in prereqs if x != 'or'])
+
+
+    def flatten_lists(lists):
+        '''
+        Flattens a list of lists (e.g. 3D to 2D)
+        e.g. [[['a']], [['b']]] => [['a'], ['b']]
+        '''
+        return [x for l in lists for x in l]
+
+
+    def prereqs_and_join(prereqs_list):
+        '''
+        Joins a list of prereqs with pairwise AND logic into a single 2D list in the PREREQS FORMAT
+        Input: 3D list (topmost AND, then prereqs in the PREREQS FORMAT)
+        Output: 2D list in the PREREQS FORMAT
+        '''
+        # check for prereqs with multiple options (OR logic)
+        linear = True
+        combinations = []
+        for prereqs_index, prereqs in enumerate(prereqs_list):
+            # prereqs is in the PREREQS FORMAT (2D list)
+            if len(prereqs) > 1:
+                # length greater than 1 indicates that there are multiple options
+                prereqs_before_list = prereqs_list[:prereqs_index]
+                prereqs_after_list = prereqs_list[prereqs_index + 1:]
+                # use distributive logic law to separate each option out
+                for option in prereqs:
+                    # recursively compute each option separately
+                    recursive_prereqs_list = prereqs_before_list + [[option]] + prereqs_after_list
+                    combination = prereqs_and_join(recursive_prereqs_list)
+                    if combination not in combinations:
+                        # NOTE: unnecessary check
+                        combinations.append(combination)
+                # not all prereqs have one option anymore
+                linear = False
+                break
+
+        if linear:
+            # all prereqs in prereqs_list have a single option (no OR logic)
+            # join all the prerequisite courses in the prereqs by AND logic
+            return [[prereq for prereqs in prereqs_list for prereq in prereqs[0]]]
+        else:
+            # prereqs_list provided contains prereqs with multiple options
+            return flatten_lists(combinations)
+
+
+    # create list representation for the prerequisite string
+    const_symbols = ['and', 'or', '(', ')']
     prereqs_string = re.sub(r'\(', ' ( ', prereqs_string)
     prereqs_string = re.sub(r'\)', ' ) ', prereqs_string)
-    return [[[x]] if x not in const_symbols else x for x in prereqs_string.strip().split()]
-
-
-def prereqs_parser_simple(prereqs):
-    '''
-    Simple parser that assumes no brackets (but could have multiple same operations)
-    Input: list of base prereqs logic - could include 'and' or 'or' keywords which need to be filtered
-    Output: 2D list of prereqs - parsed (with 'and' or 'or' keywords removed)
-    e.g. [[['a']], 'and', [['b']]] => [['a', 'b']]
-    e.g. [[['a', 'b']], 'or', [['c']]] => [['a', 'b'], ['c']]
-    '''
-    # base cases
-    if not prereqs:
-        # empty prereqs
-        return []
-    elif 'and' in prereqs and 'or' in prereqs:
-        # cannot understand 'a and b or c' (without brackets)
-        raise ValueError('Bad logic')
-
-    # parse simple prereqs - removing keywords
-    if 'and' in prereqs:
-        # memoization for list_and_join to ensure unique combinations
-        ans = list_and_join([x for x in prereqs if x != 'and'], {})
-        return ans
-    else:
-        return flatten_lists([x for x in prereqs if x != 'or'])
-
-
-def list_and_join(prereqs_list, memo):
-    '''
-    Joins a list of prereqs with pairwise AND logic
-    Input: 3D list (top level AND, then prereqs, then prereq)
-    Output: 2D list
-    '''
-    # check for combinations in prereqs (OR logic) - "linear" otherwise
-    ans = []
-    linear = True
-    for prereqs_index, prereqs in enumerate(prereqs_list):
-        # combinations are represented by [['a'], ['b']] in prereqs (multiple options)
-        if len(prereqs) > 1:
-            # compute OR logic separately for each option
-            for option in prereqs:
-                # use distributive logic law to separate each option out
-                before = prereqs_list[:prereqs_index]
-                curr = [[option]]
-                after = prereqs_list[prereqs_index + 1:]
-
-                # [[['a'], ['b']], [['c', 'd']]] => [[['a']], [['c', 'd']]] OR [[['b']], [['c', 'd']]]
-                new = []
-                if prereqs_index > 0:
-                    # include prereqs before the prereqs with multiple options if they exist
-                    new.append(before)
-                new.append(curr)
-                if prereqs_index < len(prereqs_list) - 1:
-                    # include prereqs after the prereqs with multiple options if they exist
-                    new.append(after)
-                new_lists = flatten_lists(new)
-                # only include unique combinations
-                if str(new_lists) not in memo:
-                    ans.append(list_and_join(new_lists, memo))
-
-            linear = False
-
-    memo[str(prereqs_list)] = True
-    if linear:
-        # no combinations present (simple) - use associative logic law
-        # [[['b']], [['c']] ] => [['b', 'c']]
-        # [[['a', 'b']], [['c']] ] => [['a', 'b', 'c']]
-        # flattening process (ignore level ordering):
-        # [[['a', 'b']], [['c']]] => [['a', 'b'], ['c']] => ['a', 'b', 'c']
-        # then we want [['a', 'b', 'c']]
-        return [flatten_lists(flatten_lists(prereqs_list))]
-        # or the bottom-most prereq's extracted with [[prereq for prereqs in prereqs_list for prereq in prereqs[0]]]
-    else:
-        # 3D list ans => 2D list
-        return flatten_lists(ans)
-
-
-def flatten_lists(lists):
-    return sum(lists, [])
+    # represent each prerequisite course within a single 2D list in the PREREQS FORMAT
+    prereqs = [[[x]] if x not in const_symbols else x for x in prereqs_string.lower().split()]
+    return logic_parser(prereqs)
 
 
 def relevant_prereqs_filter(selected_course_codes, course):
