@@ -116,9 +116,9 @@ Queue ADT
 import queue
 class PriorityQueue(queue.PriorityQueue):
     '''
-    Custom wrapper for queue.PriorityQueue, inheriting most functionality. However, for the
-    interface: the highest priority item/Course object has the highest priority score tuple
-    rather than the lowest tuple (as in the original class)
+    Custom wrapper for the PriorityQueue class provided by the queue module, inheriting most functionality.
+    However, for the interface: the highest priority item/Course object has the highest priority score tuple
+    rather than the lowest tuple (as in the original class).
     '''
     def __init__(self):
         ''' Constructor method '''
