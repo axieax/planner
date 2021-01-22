@@ -132,6 +132,7 @@ Plan
 """
 # Plan - can have courses already in certain terms
 plan = [[] for i in range(len(courses))]
+plan[2].append('data1001')
 
 # Max num of courses per term
 plan_specs = {

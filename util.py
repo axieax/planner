@@ -1,3 +1,5 @@
+import copy
+
 """
 Course ADT
 """
@@ -36,6 +38,15 @@ class Course:
         course_rarity = corrections.get('course_rarity', -len(self.terms))
         course_level = corrections.get('course_level', -self.level)
         return dependency_score, course_rarity, course_level
+
+    def copy(self, **corrections):
+        ''' Returns a deep copy of the Course object with optional corrections '''
+        new_course = Course(self.code, self.terms, '', self.uoc)
+        new_course.code = corrections.get('code', self.code)
+        new_course.terms = corrections.get('terms', copy.deepcopy(self.terms))
+        new_course.prereqs = corrections.get('prereqs', copy.deepcopy(self.prereqs))
+        new_course.uoc = corrections.get('uoc', self.uoc)
+        return new_course
 
     def __repr__(self):
         ''' Representation of a Course object for debugging purposes '''
@@ -116,9 +127,9 @@ Queue ADT
 import queue
 class PriorityQueue(queue.PriorityQueue):
     '''
-    Custom wrapper for the PriorityQueue class provided by the queue module, inheriting most functionality.
-    However, for the interface: the highest priority item/Course object has the highest priority score tuple
-    rather than the lowest tuple (as in the original class).
+    Custom wrapper for the PriorityQueue class provided by the queue module, adjusting inherited functionality
+    so that the highest priority item/Course object has the highest priority score tuple, rather than the
+    lowest tuple (as in the original class). Also has a shallow copy method.
     '''
     def __init__(self):
         ''' Constructor method '''
@@ -263,10 +274,10 @@ def prereqs_parser(prereqs_string):
     return logic_parser(prereqs)
 
 
-def relevant_prereqs_filter(selected_course_codes, course):
-    ''' Returns a list of relevant prereqs for the selected courses (list of strings) '''
-    # NOTE: return a new Course object with these prereqs?
-    return [comb for comb in course.prereqs if all([prereq in selected_course_codes for prereq in comb])]
+def relevant_prereqs_filter(original_prereqs, selected_course_codes):
+    ''' Returns a list of relevant prereqs to the selected courses (list of strings) '''
+    return [comb for comb in original_prereqs if all(prereq in selected_course_codes for prereq in comb)]
+
 
 def prereqs_expression(prereqs):
     ''' Debugging logic '''
