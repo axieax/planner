@@ -19,7 +19,7 @@ class Course:
         self.terms = terms
         self.prereqs = prereqs_parser(prereqs)
         self.uoc = uoc
-        self.level = int(code[4])
+        self.level = course_level(code)
         self.exclusion = [] # TODO
 
     def num_prerequisites(self):
@@ -67,6 +67,10 @@ class Course:
     def __gt__(self, other):
         ''' Greater than comparison between two Course objects for priority queue comparison purposes '''
         return self.code > other.code
+
+
+def course_level(course_code):
+    return int(course_code[4])
 
 
 """
@@ -147,15 +151,9 @@ class PriorityQueue(queue.PriorityQueue):
     def pop(self):
         '''
         Removes the Course object with the highest priority from the priority queue.
-        Returns the Course object and a summary (dict) of its priority
         '''
-        dependency_score, course_rarity, course_level, course = super().get()
-        priority_summary = {
-            'dependency_score': -dependency_score,
-            'course_rarity': -course_rarity,
-            'course_level': -course_level,
-        }
-        return course, priority_summary
+        _, _, _, course = super().get()
+        return course
 
 
 """

@@ -1,8 +1,8 @@
 from copy import deepcopy
-from util import Course, Graph, PriorityQueue, relevant_prereqs_filter
+from numpy import average, var as variance
+from util import Course, Graph, PriorityQueue, course_level, relevant_prereqs_filter
 from data import courses, plan, plan_specs, all_courses
 
-DEBUG = False
 NUM_TERMS = 4
 
 '''
@@ -15,21 +15,42 @@ Key definitions:
     *_index - int
 '''
 
-def print_plan(plan):
-    stats = plan_stats(plan)
-    start_index = stats['start_index']
-    finish_index = stats['finish_index']
-    total_study_terms = stats['total_study_terms']
-    for plan_index, term_courses in enumerate(plan[:finish_index + 1]):
-        print(f'Year {plan_index//NUM_TERMS + 1} Term {plan_index % NUM_TERMS}: {term_courses}')
-    print(f'Start: Year {start_index//NUM_TERMS + 1} Term {start_index % NUM_TERMS}')
-    print(f'Finish: Year {finish_index//NUM_TERMS + 1} Term {finish_index % NUM_TERMS}')
-    print(f'Terms of study: {total_study_terms} terms')
-    print(f'Total duration: {(finish_index - start_index + 1) // NUM_TERMS} years and {(finish_index - start_index + 1) % NUM_TERMS} terms; or {finish_index - start_index + 1} total terms')
+"""
+Plan info functions
+"""
+
+def plan_balance(plan):
+    '''
+    Calculates how balanced the plan is based on:
+        term density variance (number of courses per term)
+        difficulty variance (change in average level per term)
+    '''
+    # separate summer and standard terms
+    summer_terms = []
+    standard_terms = []
+    for plan_index, term in enumerate(plan):
+        if plan_index % 4 == 0:
+            summer_terms.append(term)
+        else:
+            standard_terms.append(term)
+
+    # calculate term density variance
+    summer_term_density_variance = variance([len(term) for term in summer_terms])
+    standard_term_density_variance = variance([len(term) for term in standard_terms])
+
+    # calculate difficulty variance
+    # ideally, the change in difficulty for the plan (level delta) should be constant -> minimise variance in change in level delta
+    info = plan_info(plan)
+    study_plan = plan[info['start_index']: info['finish_index'] + 1]
+    average_term_levels = [average([course_level(course_code) for course_code in term]) for term in plan if len(term) != 0]
+    term_level_delta = [average_term_levels[i + 1] - average_term_levels[i] for i in range(len(average_term_levels) - 1)]    
+    difficulty_variance = variance(term_level_delta)
+
+    return 2 * standard_term_density_variance + summer_term_density_variance + difficulty_variance
 
 
-def plan_stats(plan):
-    ''' Returns a dictionary of stats related to the plan '''
+def plan_info(plan):
+    ''' Returns a dictionary of info regarding the plan '''
     # find finishing term - first term from end that is non-empty
     finish_index = len(plan) - 1
     while not plan[finish_index]:
@@ -49,6 +70,24 @@ def plan_stats(plan):
         'total_duration': finish_index - start_index + 1,
     }
 
+
+def print_plan(plan):
+    ''' Debugging: plan print '''
+    info = plan_info(plan)
+    start_index = info['start_index']
+    finish_index = info['finish_index']
+    total_study_terms = info['total_study_terms']
+    for plan_index, term_courses in enumerate(plan[:finish_index + 1]):
+        print(f'Year {plan_index//NUM_TERMS + 1} Term {plan_index % NUM_TERMS}: {term_courses}')
+    print(f'Start: Year {start_index//NUM_TERMS + 1} Term {start_index % NUM_TERMS}')
+    print(f'Finish: Year {finish_index//NUM_TERMS + 1} Term {finish_index % NUM_TERMS}')
+    print(f'Terms of study: {total_study_terms} terms')
+    print(f'Total duration: {(finish_index - start_index + 1) // NUM_TERMS} years and {(finish_index - start_index + 1) % NUM_TERMS} terms; or {finish_index - start_index + 1} total terms')
+
+
+"""
+Algorithm functions
+"""
 
 def placed_index(plan, course_code):
     '''
@@ -107,8 +146,7 @@ def possible_insertion(plan, plan_specs, plan_index, selected_courses, course):
 
 def place_course(plan, plan_specs, selected_courses, course):
     '''
-    Places a Course object into the plan. Returns a list of plans with the course placed in each plan
-    for each of the course's term offerings.
+    Places a Course object into the plan. Returns a list of plans with the course placed for each of the course's term offerings.
     '''
     possible_plans = []
 
@@ -136,47 +174,65 @@ def place_course(plan, plan_specs, selected_courses, course):
     return possible_plans
 
 
-def average(x):
-    return sum(x) / len(x)
-
-def evaluate_plan(plan):
+def plan_placement(plan, plan_specs, selected_courses, unplaced_course_codes, pq):
     '''
-    Evalutation based on how balanced the plan is
-        average term course density (number of courses per term)
-        level difference (average level per term)
+    Places all the courses in the PriorityQueue pq into the provided plan.
     '''
-    term_density = {}
-    level_difference = 0
-    for term_index, term in plan:
-        if term:
-            # term density
-            num_courses = len(terms)
-            term_density[num_courses] = term_density.get(num_courses, 0) + 1
-            # level difference
-            year = term_index // 4 + 1
-            term_levels = [int(c[4]) for c in term]
-            level_difference += abs(year - average(term_levels))
-    
-    
-    
-    # multiple courses in same summer bad
-    # average term level density
-    total_course_density = 0
-    total_level_density = 0
-    for term in plan:
-        if term:
-            course_density = len(term)
-            level_density = sum(int(c[4]) for c in term) / course_density
-    
-    total_study_terms = plan_stats(plan)['total_study_terms']
-    average_course_density = total_course_density / total_study_terms
-    average_level_density = total_level_density / total_study_terms
-    pass
+    # base case
+    if pq.empty():
+        return plan
 
+    # retrieve the course with the highest priority for placement
+    course = pq.pop()
+    # place the course into its first available term offering
+    new_plan = place_course(plan, plan_specs, selected_courses, course)[0]
+    unplaced_course_codes.remove(course.code)
+
+    # recursively place remaining courses from the priority queue
+    return plan_placement(new_plan, plan_specs, selected_courses, unplaced_course_codes, pq)
+
+
+def generate_plans(plans, plan_specs, selected_courses, pq):
+    '''
+    Generates all possible plans for placing the courses from pq into the provided plan
+    (based on first available term offerings).
+    '''
+    # base case
+    if pq.empty():
+        return plans
+
+    # retrieve the course with the highest priority for placement
+    course = pq.pop()
+    # compute new list of plans with the course placed in each plan
+    new_plans = []
+    for plan in plans:
+        # list of plans with course placed in each of its first available term offerings
+        possible_plans = place_course(plan, plan_specs, selected_courses, course)
+        new_plans += possible_plans
+
+    # recursively place remaining courses from the priority queue
+    return generate_plans(new_plans, plan_specs, selected_courses, pq)
 
 
 def main(plan, plan_specs, selected_course_codes, find_optimal):
-
+    '''
+    Main algorithm for creating a plan for the provided courses.
+    Returns a list of plans sorted by how balanced it is.
+    Input:
+        plan (2D list of course codes)
+        plan_specs (dict containing plan info)
+            starting_term (int)
+            max_uoc: maximum uoc for each term (list of int)
+        selected_courses_codes: list of all course codes for the courses selected (list of str)
+        find_optimal: find optimal placement (bool)
+    Output dict containing plans:
+        plan (2D list of course codes - input with unplaced courses placed)
+        info (dict containing plan info)
+            start_index: index in plan where the first term starts (int)
+            finish_index: index in plan where the last term ends (int)
+            num_study_terms: number of terms in the plan with classes (int),
+            total_duration: number of terms in the plan (int)
+    '''
     # filter relevant prerequisites
     selected_courses = {}
     for course_code in selected_course_codes:
@@ -213,57 +269,56 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
     if find_optimal:
         # find all possible plan permutations
         plans = generate_plans([plan], plan_specs, selected_courses, pq)
-        shortest_plan_length = min(plan_stats(p)['total_duration'] for p in plans)
-        plans = [p for p in plans if plan_stats(p)['total_duration'] == shortest_plan_length]
-        # sort by difficulty, lowest average num courses per term
+        # keep the shortest plans
+        shortest_plan_length = min(plan_info(plan)['total_duration'] for plan in plans)
+        plans = [plan for plan in plans if plan_info(plan)['total_duration'] == shortest_plan_length]
+        # sort plans by its balance score (to find optimal)
+        plans.sort(key=plan_balance, reverse=False)
     else:
+        # place remaining unplaced courses using the same approach
         plans = [plan_placement(plan, plan_specs, selected_courses, unplaced_course_codes, pq)]
-    
+
+    # TEMP: prune plan length
+    plans = [plan[:plan_info(plan)['finish_index'] + 1] for plan in plans]
+
+    # sort each term alphabetically
+    for plan in plans:
+        for term in plan:
+            term.sort()
+
+    # remove duplicate plans if they exist
+    memo = set(str(plan) for plan in plans)
+    new_plans = []
+    for plan in plans:
+        memo.remove(str(plan))
+        if str(plan) not in memo:
+            # ignore plan if its duplicates exist
+            new_plans.append(plan)
+    plans = new_plans
+
+    # TEMP: debugging
     for p in plans:
         print_plan(p)
+        print(plan_balance(p))
         print('')
 
     return {
         'plans': [
             {
                 'plan': p,
-                'specs': plan_stats(p),
+                'info': plan_info(p),
             }
             for p in plans
         ],
     }
-    
-    # plans: array of {
-    #   'courses': [],
-    #   'max_uoc': 20,
-    # }
-
-
-def plan_placement(plan, plan_specs, selected_courses, unplaced_course_codes, pq):
-    if pq.empty():
-        return plan
-    
-    course, _ = pq.pop()
-    new_plan = place_course(plan, plan_specs, selected_courses, course)[0]
-    unplaced_course_codes.remove(course.code)
-    return plan_placement(new_plan, plan_specs, selected_courses, unplaced_course_codes, pq)
-
-
-
-def generate_plans(plans, plan_specs, selected_courses, pq):
-    if pq.empty():
-        return plans
-    
-    course, _ = pq.pop()
-    new_plans = []
-    for plan in plans:
-        possible_plans = place_course(plan, plan_specs, selected_courses, course)
-        new_plans += possible_plans
-    return generate_plans(new_plans, plan_specs, selected_courses, pq)
-
-
 
 
 if __name__ == '__main__':
-    main(plan, plan_specs,[course.code for course in courses], True)
-    # option for fast placement - chuck everything in pq
+    main(plan, plan_specs,[course.code for course in courses], find_optimal=True)
+
+# TODO: add dynamic list size increase (can remove finish_index)
+# plans: array of {
+#   'courses': [],
+#   'max_uoc': 20,
+# } ??
+# term index instead of plan index - e.g. term_index, term in enumerate(plan)

@@ -1,5 +1,5 @@
 from flask import Flask, request
-from algo import main
+from plan import main
 from data import courses, plan, plan_specs
 import json
 
