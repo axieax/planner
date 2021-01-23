@@ -6,4 +6,4 @@ UNSW Degree Planner
 - `plan.py` contains the plan algorithm
 - `data.py` contains course and plan data
 - `scrape.py` scrapes the handbook for data
-- `util.py` contains abstract data types for the algorithm, courses and plan, and other general utilties
+- `util.py` contains abstract data types for the algorithm, courses and plan, and other general utilities

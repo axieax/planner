@@ -13,17 +13,19 @@ def index():
 @APP.route('/api', methods=['GET'])
 def api():
     return json.dumps(main(
-        selected_course_codes=request.args.get('selected_course_codes'),
         plan=request.args.get('plan'),
-        plan_specs=request.args.get('plan_specs')
+        plan_specs=request.args.get('plan_specs'),
+        selected_course_codes=request.args.get('selected_course_codes'),
+        find_optimal=request.args.get('find_optimal'),
     ))
 
 @APP.route('/test')
 def test():
     return json.dumps(main(
-        selected_course_codes=[course.code for course in courses],
         plan=plan,
-        plan_specs=plan_specs
+        plan_specs=plan_specs,
+        selected_course_codes=[course.code for course in courses],
+        find_optimal=True,
     ))
 
 sample_request = json.dumps({
