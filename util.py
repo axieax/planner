@@ -265,8 +265,11 @@ def prereqs_parser(prereqs_string):
 
     # create list representation for the prerequisite string
     const_symbols = ['and', 'or', '(', ')']
-    prereqs_string = re.sub(r'\(', ' ( ', prereqs_string)
-    prereqs_string = re.sub(r'\)', ' ) ', prereqs_string)
+    # remove simple score requirements
+    prereqs_string = re.sub(r'\(.{0,2}\)', ' ', prereqs_string)
+    # space out brackets
+    prereqs_string = re.sub(r'\(|\[', ' ( ', prereqs_string)
+    prereqs_string = re.sub(r'\)|\]', ' ) ', prereqs_string)
     # represent each prerequisite course within a single 2D list in the PREREQS FORMAT
     prereqs = [[[x]] if x not in const_symbols else x for x in prereqs_string.lower().split()]
     return logic_parser(prereqs)

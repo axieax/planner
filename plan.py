@@ -275,7 +275,7 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
         # sort plans by its balance score (to find optimal)
         plans.sort(key=plan_balance, reverse=False)
     else:
-        # place remaining unplaced courses using the same approach
+        # place remaining unplaced courses using the same approach as before
         plans = [plan_placement(plan, plan_specs, selected_courses, unplaced_course_codes, pq)]
 
     # TEMP: prune plan length
@@ -297,10 +297,12 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
     plans = new_plans
 
     # TEMP: debugging
-    for p in plans:
-        print_plan(p)
-        print(plan_balance(p))
-        print('')
+    # for p in plans:
+    #     print_plan(p)
+    #     print(plan_balance(p))
+    #     print('')
+
+    print_plan(plans[0])
 
     return {
         'plans': [
