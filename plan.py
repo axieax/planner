@@ -263,7 +263,10 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
 
     # PLACEMENT PART 2: Find optimal placement for remaining courses
     # Place remaining unplaced courses into the priority queue
+    print(plan)
     for course_code in unplaced_course_codes:
+        print(course_code, end=' ')
+        print(selected_courses[course_code].terms)
         pq.push(prereqs, selected_courses[course_code])
 
     if find_optimal:
@@ -302,6 +305,9 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
     #     print(plan_balance(p))
     #     print('')
 
+    # for p in plans:
+        # print_plan(p)
+        # print('')
     print_plan(plans[0])
 
     return {
@@ -316,7 +322,7 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
 
 
 if __name__ == '__main__':
-    main(plan, plan_specs,[course.code for course in courses], find_optimal=True)
+    main(plan, plan_specs,[course.code for course in courses], find_optimal=False)
 
 # TODO: add dynamic list size increase (can remove finish_index)
 # plans: array of {

@@ -19,7 +19,7 @@ def scrape_degrees():
         degree_body = json.load(f)
     for degree in payload:
         # retrieve data for each degree
-        degree_body['query']['bool']['must'][0]['query_string']['query'] = f'unsw_pcourse.code: {degree['code']}'
+        degree_body['query']['bool']['must'][0]['query_string']['query'] = f"unsw_pcourse.code: {degree['code']}"
         resp = requests.get(API, json=degree_body)
         payload = json.loads(resp.content)['contentlets']
 

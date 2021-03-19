@@ -3,7 +3,7 @@ all_degrees = {} # indexed by degree_code
 all_courses = {} # indexed by course_code
 
 # load pickled data
-
+NUM_TERMS = 4
 
 
 
@@ -78,7 +78,9 @@ math2601 = Course('MATH2601', [2], 'MATH1231 or DPST1014 or MATH1241 or MATH1251
 math2621 = Course('MATH2621', [3], 'MATH1231 or DPST1014 or MATH1241 or MATH1251', 6)
 math2901 = Course('MATH2901', [2], 'MATH1231 or MATH1241 or MATH1251 or DPST1014', 6)
 math2931 = Course('MATH2931', [3], 'MATH2901 or MATH2801', 6)
-math3411 = Course('MATH3411', [1, 3], 'MATH1081 or MATH1231(CR) or DPST1014 (CR) or MATH1241(CR) or MATH1251(CR) or MATH2099', 6)
+# math3171 = Course('MATH3171', [3], '(1) [MATH2011 or MATH2111] and [MATH2501 or MATH2601]; or (2) both MATH2069 (CR) and MATH2099 ; or (3) both [MATH2018 or MATH2019] (DN) and MATH2089 .', 6)
+math3171 = Course('MATH3171', [3], '([MATH2011 or MATH2111] and [MATH2501 or MATH2601]) or (MATH2069 (CR) and MATH2099) or ([MATH2018 or MATH2019] (DN) and MATH2089)', 6)
+math3411 = Course('MATH3411', [3], 'MATH1081 or MATH1231(CR) or DPST1014 (CR) or MATH1241(CR) or MATH1251(CR) or MATH2099', 6)
 # math3521 = Course('MATH3521', [1], '12 units of credit in Level 2 Math courses', 6) # under conditions for enrolment
 math3521 = Course('MATH3521', [1], 'MATH2111 and MATH2621', 6) # under conditions for enrolment
 math3821 = Course('MATH3821', [2], 'MATH2831 or MATH2931', 6)
@@ -90,38 +92,78 @@ math3911 = Course('MATH3911', [1], 'MATH2931 or MATH2831', 6)
 # 3789 2021 Version
 
 ### Selected Options ###
-courses.append(comp1511)
+# # OLD PLAN
+# courses.append(comp1511)
+# courses.append(math1081)
+# courses.append(math1141)
+# courses.append(data1001)
+# courses.append(comp2521)
+# courses.append(math1241)
+# courses.append(comp1521)
+# courses.append(comp1531)
+# courses.append(math2621)
+# courses.append(comp3411)
+# courses.append(comp6841)
+# courses.append(math2111)
+# # courses.append(engg2600) # * 3 - placing it once automatically places it for the next 2 terms??
+# courses.append(comp3121)
+# courses.append(math2601)
+# courses.append(math2901)
+# courses.append(comp4418)
+# courses.append(math2931)
+# courses.append(math3411)
+# courses.append(psyc1001)
+# courses.append(comp9417)
+# courses.append(math3911)
+# courses.append(comp2511)
+# courses.append(comp9444)
+# courses.append(math3821)
+# courses.append(comp3900)
+# courses.append(comp4920)
+# courses.append(math3871)
+# courses.append(scif3199)
+# courses.append(comp3231)
+# courses.append(math3521)
+# courses.append(math3901)
+
+# NEW PLAN
 courses.append(math1081)
-courses.append(math1141)
-courses.append(data1001)
-courses.append(comp2521)
-courses.append(math1241)
+courses.append(comp1511)
 courses.append(comp1521)
 courses.append(comp1531)
-courses.append(math2621)
-courses.append(comp3411)
-courses.append(comp6841)
-courses.append(math2111)
-# courses.append(engg2600) # * 3 - placing it once automatically places it for the next 2 terms??
-courses.append(comp3121)
-courses.append(math2601)
-courses.append(math2901)
-courses.append(comp4418)
-courses.append(math2931)
-courses.append(math3411)
-courses.append(psyc1001)
-courses.append(comp9417)
-courses.append(math3911)
 courses.append(comp2511)
-courses.append(comp9444)
-courses.append(math3821)
+courses.append(comp2521)
+courses.append(comp3121)
 courses.append(comp3900)
 courses.append(comp4920)
-courses.append(math3871)
-courses.append(scif3199)
+
+courses.append(engg2600) # * 3 - placing it once automatically places it for the next 2 terms?? or manual placement
 courses.append(comp3231)
-courses.append(math3521)
+courses.append(comp3311)
+courses.append(comp3411)
+courses.append(comp6841)
+courses.append(comp9417)
+courses.append(comp9444)
+
+
+courses.append(math1141)
+courses.append(math1241)
+courses.append(math2111)
+courses.append(math2601)
+courses.append(math2901)
+courses.append(math2931)
+courses.append(math3821)
 courses.append(math3901)
+courses.append(math3911)
+courses.append(math3871)
+
+
+courses.append(data1001)
+courses.append(math2621)
+courses.append(math3411)
+courses.append(math3521)
+courses.append(math3171)
+courses.append(psyc1001)
 
 all_courses = {course.code: course for course in courses}
 
@@ -131,13 +173,26 @@ Plan
 """
 # Plan - can have courses already in certain terms
 plan = [[] for i in range(len(courses))]
-plan[2].append('data1001')
+plan[1] = ['comp1511', 'math1141', 'math1081']
+plan[2] = ['comp2521', 'math1241', 'data1001']
+plan[3] = ['comp1521', 'comp1531', 'math2621']
+# plan[2].append('data1001')
+plan[5] = ['comp3411', 'comp6841', 'engg2600', 'math2111']
+# plan[5].append('engg2600')
+plan[6].append('engg2600')
+plan[6].append('comp3121')
+plan[7].append('engg2600')
+# plan[7].append('comp3311')
+plan[9].append('psyc1001')
+plan[9].append('comp9417')
+# plan[9].append('math3911')
 
 # Max num of courses per term
 plan_specs = {
     'starting_term': 1,
-    'max_uoc': [20 for i in range(len(courses))],
+    'max_uoc': [12 if i % NUM_TERMS == 0 else 20 for i in range(len(courses))],
 }
+plan_specs['max_uoc'][4] = 0
 
 """
 Front end design:
