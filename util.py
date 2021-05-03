@@ -5,7 +5,7 @@ Course ADT
 """
 class Course:
     ''' Class for a Course '''
-    def __init__(self, code, terms, prereqs, uoc):
+    def __init__(self, code, terms, prereqs, uoc=6):
         '''
         Constructor method for a Course
             code: course code (str) CCCCNNNN - stored in lowercase
