@@ -47,6 +47,9 @@ engg2600 = Course('ENGG2600', [1, 2, 3], '??', 2) # !!!
 ''' PSYC '''
 psyc1001 = Course('PSYC1001', [1, 2], '', 6)
 
+''' ENGG '''
+engg1000 = Course('ENGG1000', [1, 3], '', 6)
+
 ''' COMP '''
 comp1511 = Course('COMP1511', [1, 2, 3], '', 6)
 comp2521 = Course('COMP2521', [1, 2, 3], 'COMP1511 or DPST1091 or COMP1917 or COMP1921', 6)
@@ -57,6 +60,8 @@ comp3121 = Course('COMP3121', [2, 3], 'COMP1927 or COMP2521', 6)
 comp3231 = Course('COMP3231', [1], '(COMP1521 or DPST1092 or COMP2121 or ELEC2142) and (COMP2521 or COMP1927)', 6)
 comp3311 = Course('COMP3311', [1, 3], 'COMP2521 or COMP1927', 6)
 comp3411 = Course('COMP3411', [0, 1], 'COMP2521 or COMP1927', 6)
+# haven't filtered marks
+comp3821 = Course('COMP3821', [1], 'COMP1927 or COMP2521', 6)
 # comp3900 = Course('COMP3900', [1, 2, 3], 'COMP1531, and COMP2521 or COMP1927, and enrolled in a BSc Computer Science major with completion of 102 uoc', 6)
 comp3900 = Course('COMP3900', [1, 2, 3], 'COMP1531 and (COMP2521 or COMP1927)', 6)
 comp4418 = Course('COMP4418', [3], 'COMP3411', 6)
@@ -165,6 +170,9 @@ courses.append(math3521)
 courses.append(math3171)
 courses.append(psyc1001)
 
+
+# courses = [comp1511, comp1521, comp1531, comp2521, math1141, math1241, math1081, data1001, engg1000, comp3231, comp3821]
+
 all_courses = {course.code: course for course in courses}
 
 
@@ -173,18 +181,18 @@ Plan
 """
 # Plan - can have courses already in certain terms
 plan = [[] for i in range(len(courses))]
-plan[1] = ['comp1511', 'math1141', 'math1081']
-plan[2] = ['comp2521', 'math1241', 'data1001']
-plan[3] = ['comp1521', 'comp1531', 'math2621']
-# plan[2].append('data1001')
-plan[5] = ['comp3411', 'comp6841', 'engg2600', 'math2111']
-# plan[5].append('engg2600')
+# plan[1] = ['comp1511', 'math1141', 'math1081']
+# plan[2] = ['comp2521', 'math1241', 'data1001']
+# plan[3] = ['comp1521', 'comp1531', 'math2621']
+# # plan[2].append('data1001')
+# plan[5] = ['comp3411', 'comp6841', 'engg2600', 'math2111']
+plan[5].append('engg2600')
 plan[6].append('engg2600')
-plan[6].append('comp3121')
+# plan[6].append('comp3121')
 plan[7].append('engg2600')
-# plan[7].append('comp3311')
-plan[9].append('psyc1001')
-plan[9].append('comp9417')
+# # plan[7].append('comp3311')
+# plan[9].append('psyc1001')
+# plan[9].append('comp9417')
 # plan[9].append('math3911')
 
 # Max num of courses per term
