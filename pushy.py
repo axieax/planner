@@ -55,8 +55,6 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
         print(f'Term: {term_number}')
         foo = []
         unsatisfied = set([x[3].code for x in pq.queue])
-        print("hi")
-        print(unsatisfied)
 
         while len(term) != 3:
             if pq.empty():
@@ -67,9 +65,7 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
             # check prereqs satisfied
             for comb in course.prereqs:
                 print(set(comb))
-            for i in unsatisfied:
-                print(i)
-            if term_number in course.terms and (all(not x for x in course.prereqs) or any(unsatisfied.intersection(set(comb)) == set() for comb in course.prereqs) ):
+            if term_number in course.terms and (all(not x for x in course.prereqs) or any(unsatisfied & set(comb) == set() for comb in course.prereqs) ):
                 term.append(course.code)
             else:
                 foo.append(course)
