@@ -52,25 +52,25 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
         term_number = index % 4
         if term_number == 0:
             continue
-        print(f'Term: {term_number}')
-        foo = []
+        #print(f'Term: {term_number}')
+        refused = []
         unsatisfied = set([x[3].code for x in pq.queue])
 
         while len(term) != 3:
             if pq.empty():
-                print(plan)
-                exit()
+                break
+                
             course = pq.pop()
-            print(course)
             # check prereqs satisfied
-            for comb in course.prereqs:
-                print(set(comb))
-            if term_number in course.terms and (all(not x for x in course.prereqs) or any(unsatisfied & set(comb) == set() for comb in course.prereqs) ):
+            if term_number in course.terms and (all(not x for x in course.prereqs) or any(unsatisfied & set(comb) == set() for comb in course.prereqs)):
                 term.append(course.code)
             else:
-                foo.append(course)
-        for x in foo:
+                refused.append(course)
+        #print("refused list")
+        for x in refused:
+            # print(x)
             pq.push(prereqs, x)
+    print(plan)
     return
     
     
