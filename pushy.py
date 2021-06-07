@@ -47,7 +47,7 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
     for course_code in unplaced_course_codes:
         pq.push(prereqs, selected_courses[course_code])
     
-    if long == 1:
+    if long == 0:
         # create a backtracking queue based on the possible courses, and allow for an iterating search 
         backpq = []
         while not pq.empty():
@@ -93,12 +93,9 @@ def recursive_check(backpq, index, term, plan):
     possible = []
     term_number = index % 4
     # anything in the ordered course list minus the stuff in the plan
-    unsatisfied = set([x[3].code for x in backpq])
-    for t in plan:
-        for c in t:
-            unsatisfied.remove(c)
+    unsatisfied = set([x.code for x in backpq])
     if term_number == 0:
-        return # we avoid summer for now, we can bring it back in. Notice - we need to make this more flexible by defining some "avoid" terms and "normal" terms. This nicely generalises.
+        return recursive_check(backpq, index + 1, term + 1, plan) # we avoid summer for now, we can bring it back in. Notice - we need to make this more flexible by defining some "avoid" terms and "normal" terms. This nicely generalises.
     for course in backpq:
         # check prereqs satisfied
         if term_number in course.terms and (all(not x for x in course.prereqs) or any(unsatisfied & set(comb) == set() for comb in course.prereqs)):
@@ -110,12 +107,15 @@ def recursive_check(backpq, index, term, plan):
 
 
     # check how we went in this term
-    if possible.empty() and rejected.empty():
+    if not possible and not rejected:
         # valid plan found
         print(plan)
         exit()
     for comb in poss_term:
-        plan[index] = list(comb)
+        try:
+            plan[index] = list(comb)
+        except IndexError:
+            return
         for c in comb:
             for string in comb:
                 backpq.remove(string)
