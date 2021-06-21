@@ -3,7 +3,7 @@ from numpy import average, var as variance
 from itertools import combinations
 from util import Course, Graph, PriorityQueue, course_level, relevant_prereqs_filter
 from data import NUM_TERMS, courses, plan, plan_specs, all_courses
-
+from time import sleep
 def main(plan, plan_specs, selected_course_codes, find_optimal):
     '''
     Main algorithm for creating a plan for the provided courses.
@@ -52,10 +52,13 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
         backpq = []
         while not pq.empty():
             backpq.append(pq.pop())
-        
-        for i in range(20):
-            plan = [[] for _ in range(i)] # we will have to change this into a nicer object possibly, to accomodate preferences and stuff
+        firstPossibleSolution = len(backpq) // 3
+        print (firstPossibleSolution)
+        for i in range(firstPossibleSolution, 20):
+            plan = [[] for _ in range(i + i//3 + 1) # we will have to change this into a nicer object possibly, to accomodate preferences and stuff
             recursive_check(backpq, 0, 0, plan)
+            print(i)
+            sleep(4)
 
 
                 
@@ -105,7 +108,6 @@ def recursive_check(backpq, index, term, plan):
     # now i have a list of all the possible courses i can have this term, in a prioritised order. I can now make a combination list of all the possible arrangements for the term
     poss_term = combinations(possible, 3)
 
-
     # check how we went in this term
     if not possible and not rejected:
         # valid plan found
@@ -113,15 +115,16 @@ def recursive_check(backpq, index, term, plan):
         exit()
     for comb in poss_term:
         try:
-            plan[index] = list(comb)
+            plan[index] = [x.code for x in list(comb)]
         except IndexError:
             return
         for c in comb:
-            for string in comb:
-                backpq.remove(string)
-            recursive_check(backpq, index + 1, term + 1, plan)
-            for string in comb:
-                backpq.append(string)
+            newpq = deepcopy(backpq)
+            for course in comb:
+                newpq.remove(course)
+            recursive_check(newpq, index + 1, term + 1, plan)
+            plan[index] = []
+        print(plan)
     return
 
     # place courses from priority queue
