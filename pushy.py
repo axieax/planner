@@ -39,7 +39,7 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
 
     # set up a graph modelling course prerequisites and dependencies for the selected courses
     prereqs = Graph(selected_courses.values())
-    long = 0
+    long = 1
     # create a priority queue for course placement
     pq = PriorityQueue()
 
@@ -47,24 +47,21 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
     for course_code in unplaced_course_codes:
         pq.push(prereqs, selected_courses[course_code])
     
-    if long == 0:
+    if long == 1:
         # create a backtracking queue based on the possible courses, and allow for an iterating search 
         backpq = []
         while not pq.empty():
             backpq.append(pq.pop())
-        firstPossibleSolution = len(backpq) // 3
-        print (firstPossibleSolution)
+        firstPossibleSolution = (len(backpq) // 3 + 1) 
+        firstPossibleSolution += firstPossibleSolution// 3 + 1
+        print(firstPossibleSolution)
         for i in range(firstPossibleSolution, 20):
-            plan = [[] for _ in range(i + i//3 + 1) # we will have to change this into a nicer object possibly, to accomodate preferences and stuff
+            plan = [[] for _ in range(i)] # we will have to change this into a nicer object possibly, to accomodate preferences and stuff
             recursive_check(backpq, 0, 0, plan)
-            print(i)
-            sleep(4)
 
 
                 
     else:
-
-
         plan = [[] for _ in range(20)]
         for index, term in enumerate(plan):
             term_number = index % NUM_TERMS
@@ -89,9 +86,12 @@ def main(plan, plan_specs, selected_course_codes, find_optimal):
                 # print(x)
                 pq.push(prereqs, x)
     print(plan)
-    return
-    
+    return    
+
 def recursive_check(backpq, index, term, plan):
+    if not backpq: 
+        print(plan)
+        exit()
     rejected = []
     possible = []
     term_number = index % 4
@@ -106,17 +106,26 @@ def recursive_check(backpq, index, term, plan):
         else:
             rejected.append(course)
     # now i have a list of all the possible courses i can have this term, in a prioritised order. I can now make a combination list of all the possible arrangements for the term
-    poss_term = combinations(possible, 3)
-
-    # check how we went in this term
     if not possible and not rejected:
         # valid plan found
         print(plan)
         exit()
+    if not possible:
+        return recursive_check(backpq, index + 1, term + 1, plan)
+    poss_term = [*combinations(possible, 3)]
+    if not poss_term:
+        poss_term = [*combinations(possible, 2)]
+    
+    if not poss_term:
+        poss_term = [*combinations(possible, 1)]
+    
+    # check how we went in this term
+    
     for comb in poss_term:
         try:
             plan[index] = [x.code for x in list(comb)]
         except IndexError:
+            print(plan)
             return
         for c in comb:
             newpq = deepcopy(backpq)
