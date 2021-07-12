@@ -1,0 +1,326 @@
+{
+    "3053": {
+        "name": "Biotechnology (Honours)"
+    },
+    "3061": {
+        "name": "Food Science (Honours)"
+    },
+    "3131": {
+        "name": "Materials Science and Engineering (Honours)"
+    },
+    "3132": {
+        "name": "Materials Science and Engineering (Honours) / Engineering Science"
+    },
+    "3133": {
+        "name": "Materials Science and Engineering (Honours) / Biomedical Engineering"
+    },
+    "3134": {
+        "name": "Materials Science and Engineering (Honours) / Commerce"
+    },
+    "3154": {
+        "name": "Actuarial Studies / Science"
+    },
+    "3155": {
+        "name": "Actuarial Studies / Commerce"
+    },
+    "3323": {
+        "name": "Advanced Science (Honours) / Social Science"
+    },
+    "3324": {
+        "name": "Science / Social Science"
+    },
+    "3435": {
+        "name": "Psychological Science"
+    },
+    "3457": {
+        "name": "Music / Science"
+    },
+    "3458": {
+        "name": "Music / Advanced Science (Honours)"
+    },
+    "3460": {
+        "name": "Music / Commerce"
+    },
+    "3462": {
+        "name": "Commerce / Education (Secondary)"
+    },
+    "3471": {
+        "name": "Music (Honours) / Science"
+    },
+    "3472": {
+        "name": "Music (Honours) / Advanced Science (Honours)"
+    },
+    "3473": {
+        "name": "Music (Honours) / Commerce"
+    },
+    "3502": {
+        "name": "Commerce"
+    },
+    "3521": {
+        "name": "Commerce / Economics"
+    },
+    "3523": {
+        "name": "Advanced Mathematics (Honours) / Commerce"
+    },
+    "3529": {
+        "name": "Commerce / Science"
+    },
+    "3543": {
+        "name": "Economics"
+    },
+    "3554": {
+        "name": "Commerce (Co-op)"
+    },
+    "3558": {
+        "name": "Commerce (International)"
+    },
+    "3563": {
+        "name": "Economics / Science"
+    },
+    "3564": {
+        "name": "Economics / Advanced Mathematics (Honours)"
+    },
+    "3565": {
+        "name": "Commerce (Co-op) (Honours)"
+    },
+    "3566": {
+        "name": "Economics / Advanced Science (Honours)"
+    },
+    "3572": {
+        "name": "Commerce / Fine Arts"
+    },
+    "3573": {
+        "name": "Commerce / Arts"
+    },
+    "3574": {
+        "name": "Economics / Arts"
+    },
+    "3575": {
+        "name": "Commerce / Design"
+    },
+    "3584": {
+        "name": "Commerce / Information Systems"
+    },
+    "3586": {
+        "name": "Actuarial Studies"
+    },
+    "3587": {
+        "name": "Actuarial Studies (Co op)"
+    },
+    "3588": {
+        "name": "Actuarial Studies / Economics"
+    },
+    "3589": {
+        "name": "Actuarial Studies / Advanced Mathematics (Honours)"
+    },
+    "3593": {
+        "name": "Commerce / Advanced Science (Honours)"
+    },
+    "3596": {
+        "name": "Commerce / Media (Public Relations and Advertising)"
+    },
+    "3632": {
+        "name": "Psychology (Honours)"
+    },
+    "3635": {
+        "name": "Engineering (Civil Eng w Arch) (Honours)"
+    },
+    "3671": {
+        "name": "Actuarial Studies / Information Systems"
+    },
+    "3673": {
+        "name": "Economics / Computer Science"
+    },
+    "3674": {
+        "name": "Actuarial Studies / Computer Science"
+    },
+    "3706": {
+        "name": "Engineering Science"
+    },
+    "3707": {
+        "name": "Engineering (Honours)"
+    },
+    "3761": {
+        "name": "Advanced Mathematics (Honours) / Engineering (Honours)"
+    },
+    "3762": {
+        "name": "Advanced Science (Honours) / Engineering (Honours)"
+    },
+    "3764": {
+        "name": "Engineering (Honours) / Commerce"
+    },
+    "3765": {
+        "name": "Engineering (Honours) / Law"
+    },
+    "3766": {
+        "name": "Music / Engineering (Honours)"
+    },
+    "3767": {
+        "name": "Engineering (Honours) / Science"
+    },
+    "3768": {
+        "name": "Engineering (Honours) / Biomedical Engineering"
+    },
+    "3769": {
+        "name": "Music (Honours) / Engineering (Honours)"
+    },
+    "3773": {
+        "name": "Engineering (Honours) / Engineering Science"
+    },
+    "3775": {
+        "name": "Surveying"
+    },
+    "3776": {
+        "name": "Engineering (Honours) / Surveying"
+    },
+    "3778": {
+        "name": "Computer Science"
+    },
+    "3781": {
+        "name": "Advanced Mathematics (Honours) / Computer Science"
+    },
+    "3782": {
+        "name": "Advanced Science (Honours) / Computer Science"
+    },
+    "3783": {
+        "name": "Computer Science / Arts"
+    },
+    "3784": {
+        "name": "Commerce / Computer Science"
+    },
+    "3785": {
+        "name": "Engineering (Honours) / Computer Science"
+    },
+    "3786": {
+        "name": "Computer Science / Law"
+    },
+    "3789": {
+        "name": "Science / Computer Science"
+    },
+    "3791": {
+        "name": "Computer Science / Media Arts"
+    },
+    "3835": {
+        "name": "Commerce / Aviation (Management)"
+    },
+    "3925": {
+        "name": "Science and Business"
+    },
+    "3947": {
+        "name": "Science / Arts"
+    },
+    "3948": {
+        "name": "Advanced Science (Honours) / Arts"
+    },
+    "3949": {
+        "name": "Advanced Mathematics (Honours) / Arts"
+    },
+    "3955": {
+        "name": "Environmental Management / Arts"
+    },
+    "3956": {
+        "name": "Advanced Mathematics (Honours)"
+    },
+    "3957": {
+        "name": "Advanced Science (Honours) / Fine Arts"
+    },
+    "3958": {
+        "name": "Science / Fine Arts"
+    },
+    "3959": {
+        "name": "Data Science and Decisions"
+    },
+    "3961": {
+        "name": "Engineering (Honours) / Arts"
+    },
+    "3962": {
+        "name": "Advanced Science (Honours)"
+    },
+    "3964": {
+        "name": "Information Systems (Co-op) (Honours)"
+    },
+    "3965": {
+        "name": "Environmental Management"
+    },
+    "3966": {
+        "name": "Life Sciences"
+    },
+    "3970": {
+        "name": "Science"
+    },
+    "3979": {
+        "name": "Information Systems"
+    },
+    "3980": {
+        "name": "Aviation (Flying)"
+    },
+    "3981": {
+        "name": "Aviation (Management)"
+    },
+    "3987": {
+        "name": "Science (International)"
+    },
+    "3991": {
+        "name": "Medical Science"
+    },
+    "3997": {
+        "name": "Advanced Science (Honours) / Law"
+    },
+    "3998": {
+        "name": "Advanced Mathematics (Honours) / Law"
+    },
+    "3999": {
+        "name": "Medicinal Chemistry (Honours)"
+    },
+    "4058": {
+        "name": "Economics / Education (Secondary)"
+    },
+    "4076": {
+        "name": "Science / Education (Secondary)"
+    },
+    "4500": {
+        "name": "Science (Honours)"
+    },
+    "4501": {
+        "name": "Commerce (Honours)"
+    },
+    "4502": {
+        "name": "Economics (Honours)"
+    },
+    "4515": {
+        "name": "Computer Science & Engineering (Honours)"
+    },
+    "4518": {
+        "name": "Psychological Science (Honours)"
+    },
+    "4520": {
+        "name": "Actuarial Studies (Honours)"
+    },
+    "4721": {
+        "name": "Psychology (Honours) / Law"
+    },
+    "4722": {
+        "name": "Psychological Science / Law"
+    },
+    "4733": {
+        "name": "Commerce / Law"
+    },
+    "4737": {
+        "name": "Actuarial Studies / Law"
+    },
+    "4744": {
+        "name": "Economics / Law"
+    },
+    "4755": {
+        "name": "Medicinal Chemistry (Honours) / Law"
+    },
+    "4770": {
+        "name": "Science / Law"
+    },
+    "4772": {
+        "name": "Science and Business / Law"
+    },
+    "4795": {
+        "name": "Data Science and Decisions / Law"
+    }
+}

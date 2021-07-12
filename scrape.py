@@ -1,3 +1,4 @@
+from os import PathLike
 import re
 import json
 import requests
@@ -33,8 +34,20 @@ def scrape_specialisations():
     pass
 
 def scrape_courses():
-    pass
-
+    # scrape a list of prerequsites for each course - for now this will just be the conditions for enrollment
+    with open('coursePayload.json') as f:
+        payload = f.readlines()
+    if payload == "" or payload == '\n':
+        with open('query_requirements.json') as f:
+            course_body = json.load(f)
+        resp = requests.get(API, json=course_body)
+        payload = json.loads(resp.content)["contentlets"][0]
+    print(payload)
+    # for course in data:
+    #     all_courses[course['code']] = {
+    #         'name': course['name']
+    #     }
+        
 
 
 
@@ -56,5 +69,5 @@ def scrape_courses():
 
 
 if __name__ == '__main__':
-    scrape_degrees()
+    #scrape_degrees()
     scrape_courses()
