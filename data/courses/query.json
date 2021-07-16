@@ -1,0 +1,55 @@
+{
+ "query": {
+    "bool": {
+      "must": [
+        {
+          "query_string": {
+            "query": "unsw_psubject.code: COMP9417"
+          }
+        },
+        {
+          "term": {
+            "live": true
+          }
+        },
+        {
+          "bool": {
+            "minimum_should_match": "100%",
+            "should": [
+              {
+                "query_string": {
+                  "fields": [
+                    "unsw_psubject.studyLevelURL"
+                  ],
+                  "query": "undergraduate"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "implementationYear": {
+      "terms": {
+        "field": "unsw_psubject.implementationYear_dotraw",
+        "size": 100
+      }
+    },
+    "availableInYears": {
+      "terms": {
+        "field": "unsw_psubject.availableInYears_dotraw",
+        "size": 100
+      }
+    }
+  },
+  "size": 100,
+  "_source": {
+    "includes": [
+      "versionNumber",
+      "availableInYears",
+      "implementationYear"
+    ]
+  }
+} 
