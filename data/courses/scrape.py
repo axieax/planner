@@ -2,6 +2,8 @@ import re
 import json
 import requests
 
+VALID_TERMS = ['Summer Term', 'Term 1', 'Term 2', 'Term 3']
+
 URL = 'https://www.handbook.unsw.edu.au'
 API = 'https://www.handbook.unsw.edu.au/api/es/search'
 
@@ -15,17 +17,18 @@ def scrape_course(course_code: str):
     payload = json.loads(response.content)
     payload = json.loads(payload['contentlets'][0]['data'])
     print(payload)
-    # extract data
+    # extract and parse data
     # NOTE: multiple enrolment rules?
     requirement_string = payload['enrolment_rules'][0]['description']
     faculty = payload['faculty_detail'][0]['name']
-    uoc = payload['credit_points']
-    terms = payload['offering_detail']['offering_terms']
+    terms = payload['offering_detail']['offering_terms'].split(', ')
+    terms = [VALID_TERMS.index(term) for term in terms]
+    uoc = int(payload['credit_points'])
     print(requirement_string)
     print(faculty)
-    print(uoc)
     print(terms)
-
+    print(uoc)
+    
 
 
 if __name__ == '__main__':
