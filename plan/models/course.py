@@ -12,7 +12,7 @@ with open('data/faculties.json') as f:
 @dataclass(frozen=True, repr=True)
 class Course:
     code: str = ''
-    terms: list[int] = field(default_factory=lambda: [])
+    terms: list[int] = field(default_factory=list)
     raw_requirements: str = ''
     faculty: str = ''
     uoc: int = 0
