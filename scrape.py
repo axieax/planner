@@ -3,6 +3,8 @@ import re
 import json
 import requests
 from data import all_degrees, all_courses
+from string import ascii_uppercase
+from time import sleep
 URL = 'https://www.handbook.unsw.edu.au'
 API = 'https://www.handbook.unsw.edu.au/api/es/search'
 
@@ -34,15 +36,17 @@ def scrape_specialisations():
     pass
 
 def scrape_courses():
-    # scrape a list of prerequsites for each course - for now this will just be the conditions for enrollment
-    with open('coursePayload.json') as f:
-        payload = f.readlines()
-    if payload == "" or payload == '\n':
-        with open('query_requirements.json') as f:
-            course_body = json.load(f)
+    # scrape a list of prerequsites for each course - for now this will just be the conditions for 
+    with open('query_requirement.json') as f:
+        course_body = json.load(f)
+
+    for iterator in range(0, 7115, 100):
+        course_body['from'] = iterator
         resp = requests.get(API, json=course_body)
-        payload = json.loads(resp.content)["contentlets"][0]
-    print(payload)
+        payload = json.loads(resp.content)["contentlets"]
+        with open(f'dump from {iterator}', 'w') as f:
+            json.dump(payload, f)
+        sleep(5)
     # for course in data:
     #     all_courses[course['code']] = {
     #         'name': course['name']

@@ -1,55 +1,91 @@
 {
-    "query": {
-      "bool": {
-        "must": [
-          {
-            "query_string": {
-              "query": "unsw_psubject.code*"
-            }
-          },
-          {
-            "term": {
-              "live": true
-            }
-          },
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "live": true
+          }
+        },
+        [
           {
             "bool": {
-              "minimum_should_match": "100%",
+              "minimum_should_match": "50%",
               "should": [
                 {
                   "query_string": {
                     "fields": [
-                      "unsw_psubject.studyLevelURL"
+                      "*implementationYear*"
                     ],
-                    "query": "undergraduate"
+                    "query": "*2021*"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "bool": {
+              "minimum_should_match": "50%",
+              "should": [
+                {
+                  "query_string": {
+                    "fields": [
+                      "*active*"
+                    ],
+                    "query": "1"
                   }
                 }
               ]
             }
           }
         ]
-      }
-    },
-    "aggs": {
-      "implementationYear": {
-        "terms": {
-          "field": "unsw_psubject.implementationYear_dotraw",
-          "size": 100
+      ],
+      "filter": [
+        {
+          "terms": {
+            "contenttype": [
+              "unsw_psubject",
+              "unsw_pcourse",
+              "unsw_pcourse",
+              "unsw_paos"
+            ]
+          }
         }
-      },
-      "availableInYears": {
-        "terms": {
-          "field": "unsw_psubject.availableInYears_dotraw",
-          "size": 100
-        }
-      }
-    },
-    "size": 100,
-    "_source": {
-      "includes": [
-        "versionNumber",
-        "availableInYears",
-        "implementationYear"
       ]
     }
+  },
+  "sort": [
+    {
+      "unsw_psubject.code_dotraw": {
+        "order": "asc"
+      }
+    },
+    {
+      "unsw_pcourse.code_dotraw": {
+        "order": "asc"
+      }
+    },
+    {
+      "unsw_paos.code_dotraw": {
+        "order": "asc"
+      }
+    }
+  ],
+  "from": 7110,
+  "size": 100,
+  "track_scores": true,
+  "_source": {
+    "includes": [
+      "*.code",
+      "*.name",
+      "*.award_titles",
+      "*.keywords",
+      "urlmap",
+      "contenttype"
+    ],
+    "excludes": [
+      "",
+      null
+    ]
   }
+}
