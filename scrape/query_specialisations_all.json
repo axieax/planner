@@ -1,0 +1,67 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "live": true } },
+        [
+          {
+            "bool": {
+              "minimum_should_match": "100%",
+              "should": [
+                {
+                  "query_string": {
+                    "fields": ["unsw_paos.implementationYear"],
+                    "query": "*2021*"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "bool": {
+              "minimum_should_match": "100%",
+              "should": [
+                {
+                  "query_string": {
+                    "fields": ["unsw_paos.studyLevelValue"],
+                    "query": "*ugrd*"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "bool": {
+              "minimum_should_match": "100%",
+              "should": [
+                {
+                  "query_string": {
+                    "fields": ["unsw_paos.active"],
+                    "query": "*1*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      ],
+      "filter": [{ "terms": { "contenttype": ["unsw_paos"] } }]
+    }
+  },
+  "sort": [{ "unsw_paos.code_dotraw": { "order": "asc" } }],
+  "from": 0,
+  "size": 2,
+  "track_scores": true,
+  "_source": {
+    "includes": [
+      "*.code",
+      "*.name",
+      "*.award_titles",
+      "*.keywords",
+      "urlmap",
+      "contenttype"
+    ],
+    "excludes": ["", null]
+  }
+}
+
