@@ -44,9 +44,9 @@ def scrape_courses():
         course_body['from'] = iterator
         resp = requests.get(API, json=course_body)
         payload = json.loads(resp.content)["contentlets"]
-        with open(f'dump from {iterator}', 'w') as f:
+        with open(f'dumps/dump from {iterator}', 'w') as f:
             json.dump(payload, f)
-        sleep(5)
+        sleep(5)        
     # for course in data:
     #     all_courses[course['code']] = {
     #         'name': course['name']
