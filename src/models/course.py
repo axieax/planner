@@ -2,6 +2,8 @@ import re
 import json
 from dataclasses import dataclass, field
 
+from src.utils.requirements import parse_requirement
+
 CODE_PATTERN = re.compile(r"\w{4}\d{4}")
 VALID_TERMS = set(range(4))
 with open("data/faculties.json") as f:
@@ -31,8 +33,8 @@ class Course:
 
     @property
     def requirements(self) -> list:
-        # parse
-        return []
+        # parse from string
+        return parse_requirement(self.raw_requirements)
 
     @property
     def level(self) -> int:
