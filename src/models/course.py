@@ -19,7 +19,7 @@ class Course:
     faculty: str = ""
     uoc: int = 0
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Field Validation"""
         # check code format
         if not CODE_PATTERN.match(self.code):

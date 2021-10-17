@@ -25,10 +25,7 @@ class PreReq:
         """
         Predicate for checking whether a prerequisite is satisfied for a plan up to term_place
         """
-        for term in plan[:term_place]:
-            if self._code in term["courses"]:
-                return True
-        return False
+        return any(self._code in term["courses"] for term in plan[:term_place])
 
 
 class CoReq:
@@ -41,10 +38,7 @@ class CoReq:
         """
         Predicate for checking whether a corequisite is satisfied for a plan up to term_place
         """
-        for term in plan[: term_place + 1]:
-            if self._code in term["courses"]:
-                return True
-        return False
+        return any(self._code in term["courses"] for term in plan[: term_place + 1])
 
 
 class UocReq:
