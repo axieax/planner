@@ -1,24 +1,18 @@
 class And:
     """And Condition"""
 
-    def __init__(self, lhs, rhs) -> None:
-        self.lhs = lhs
-        self.rhs = rhs
+    def __init__(self, *args) -> None:
+        self._args = args
 
     def is_satisfied(self, plan, term_place) -> bool:
-        return self.lhs.is_satisfied(plan, term_place) and self.rhs.satisfied(
-            plan, term_place
-        )
+        return all(x.is_satisfied(plan, term_place) for x in self._args)
 
 
 class Or:
     """Or Condition"""
 
-    def __init__(self, lhs, rhs) -> None:
-        self.lhs = lhs
-        self.rhs = rhs
+    def __init__(self, *args) -> None:
+        self._args = args
 
     def is_satisfied(self, plan, term_place) -> bool:
-        return self.lhs.is_satisfied(plan, term_place) or self.rhs.is_satisfied(
-            plan, term_place
-        )
+        return any(x.is_satisfied(plan, term_place) for x in self._args)
