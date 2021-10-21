@@ -2,7 +2,7 @@ import re
 import json
 from dataclasses import dataclass, field
 
-# from src.utils.requirements import Requirement, parse_requirement
+from src.utils.requirements import Requirement, parse_requirement
 
 CODE_PATTERN = re.compile(r"\w{4}\d{4}")
 VALID_TERMS = set(range(4))
@@ -32,9 +32,8 @@ class Course:
             raise ValueError(f"Invalid Faculty: {self.faculty}")
 
     @property
-    def requirements(self): #  -> Requirement:
-        # parse from string
-        return self.raw_requirements# parse_requirement(self.raw_requirements)
+    def requirements(self) -> Requirement:
+        return parse_requirement(self.raw_requirements)
 
     @property
     def level(self) -> int:
