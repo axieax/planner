@@ -1,4 +1,3 @@
 NUM_TERMS = 4
-
-# possibly make this customisable
-LIGHT_TERMS = [0]
+TERMS = ("Summer Term", "1", "2", "3")
+VALID_TERMS = set(range(NUM_TERMS))
