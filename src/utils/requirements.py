@@ -97,5 +97,14 @@ class DegreeReq:
 
 def parse_requirement(prereq_str: str):
     # find ors and ands and split along them
-    # assume CS logic - collapse from left to right
-    pass
+    # assume ands supersede or's - bad assumption, but is what lots of courses use
+    if prereq_str == '':
+        return Requirement(True)
+    poss_strings = prereq_str.split('\n')
+    for string in poss_strings:
+        if string.count('Pre') > 0:
+            # assume these are prerequisites
+            # TODO: expand to more
+            ands = string.split('and')
+            ands_and_ors = [*map(lambda a: Or(a.split('or')), ands)]
+            return And(ands_and_ors)
