@@ -1,14 +1,23 @@
 from util import Course
 
 class PlanSpec:
-    def __init__(self, startterm, select, maxuoc):
-        self.starting_term = startterm
-        self.max_uoc = maxuoc
+    def __init__(self, startdate, finaldate, select, maxuoc):
+        self.startdate = startdate
+        self.finaldate = finaldate
+        self.maxUocLoad = maxuoc
         self.selected = select
 
+class InstitutionData:
+    def __init__(self, terms, courses):
+        self.terms = terms
+        self.courses = courses
+
+
 ### 
-# dropped engg2600 has the prereqs didn't make sense
+# dropped engg2600 as the prereqs didn't make sense
 # comp6447 edited the prereqs to remove a comma
+# replace empty requirements '' with 'none' to work around a bug in the prereqs parser
+# comp9243 is unfeasible at the moment because prereqs comp3331 and tele3018 are not registered with the system
 
 ### Course Options ###
 ''' DATA '''
@@ -77,10 +86,11 @@ all_courses = [data1001,scif1131,scif3199,#engg2600,
                psyc1001,comp1511,comp2521,comp1521,comp1531,comp2511,comp3121,comp3141,comp3231,comp3311,comp3411,comp3891,comp3900,comp4121,comp4418,comp4920,comp6447,comp6841,comp6843,comp9243,comp9318,comp9417,comp9418,comp9444,comp9447,math1081,math1141,math1241,math2111,math2601,math2621,math2901,math2931,math3171,math3411,math3521,math3821,math3871,math3901,math3911]
 
 ### Selected Options ###
-courses = ["comp1511", "math1081","math1141","data1001","comp2521","math1241","comp1521","comp1531","math2621","comp3411","comp6841","math2111","comp3121","math2601","math2901","comp2511","math2931"]#,"math3411","comp3891","comp9417","math3901","comp3141","comp6447","math3821","comp9447","math3171","math3871","psyc1001","math3521","math3911","comp6843","comp3900","comp9243","comp9444"]
+selected_courses = ["comp1511", "math1081","math1141","data1001","comp2521","math1241","comp1521","comp1531","math2621","comp3411","comp6841","math2111","comp3121","math2601","math2901","comp2511","math2931","math3411","comp3891","comp9417","math3901","comp3141","comp6447","math3821","comp9447","math3171","math3871","psyc1001","math3521","math3911","comp6843","comp3900",#,"comp9243",
+                    "comp9444"]
 
-#courses = ["comp1511", "math1081","math1141","data1001","comp2521","math1241","comp1521","comp1531","math2621"]#,"comp3411"]#,"comp6841","math2111","comp3121","math2601","math2901","comp2511","math2931","math3411","comp3891","comp9417","math3901","comp3141","comp6447","math3821","comp9447","math3171","math3871","psyc1001","math3521","math3911","comp6843","comp3900","comp9243","comp9444"]
 
 
-spec = PlanSpec(1, courses, 20)
+unsw = InstitutionData([0,1,2,3],all_courses)
+spec = PlanSpec((2022,2), (2025,3), selected_courses, 20)
 

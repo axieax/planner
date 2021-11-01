@@ -17,37 +17,36 @@ def course_to_asp(course):
     return constraints
 
 def plan_spec_to_asp(spec):
-    maxuoc = 'maxAcceptableLoad({}).'.format(spec.max_uoc)
-    term = 'earliestTerm({}).'.format(spec.starting_term)
+    maxuoc = 'maxUocLoad({}).'.format(spec.maxUocLoad)
+    sdate = 'startdate(time({},{})).'.format(spec.startdate[0],spec.startdate[1])
+    fdate = 'finaldate(time({},{})).'.format(spec.finaldate[0],spec.finaldate[1])
     select = ['selected({}).'.format(course) for course in spec.selected]
-    return [maxuoc,term] + select
+    return [maxuoc,sdate,fdate] + select
 
-def make_asp(all_courses, spec):
-    courses = [constraint for course in all_courses for constraint in course_to_asp(course)]
+def make_asp(inst, spec):
+    courses = [constraint for course in inst.courses for constraint in course_to_asp(course)]
+    terms = ['term({}).'.format(t) for t in inst.terms]
     specs = plan_spec_to_asp(spec)
-    return '\n'.join(specs + courses)
+    return '\n'.join(terms + specs + courses)
 
 
 def storeModel(model,output):
     l = model.symbols(atoms=True)
-    collect = []
     schedules = []
     loads = []
     for atom in l:
         if atom.name == "schedule":
-            assert(len(atom.arguments) == 3)
-            course = atom.arguments[0]
-            term = atom.arguments[1]
-            year = atom.arguments[2]
-            schedules.append((str(course),int(str(term)),int(str(year))))
-        if atom.name == "load":
-            assert(len(atom.arguments) == 3)
-            term = atom.arguments[0]
-            year = atom.arguments[1]
-            load = atom.arguments[2]
-            loads.append((int(str(term)),int(str(year)),int(str(load))))
-        elif atom.name == "attribute":
-            collect += [(atom.arguments[0].name, atom.arguments[1].name)]
+            assert(len(atom.arguments) == 2)
+            (date, course) = atom.arguments
+            assert date.match('time', 2)
+            (year,term) = date.arguments
+            schedules.append((int(str(year)),int(str(term)),str(course)))
+        elif atom.name == "uocLoad":
+            assert(len(atom.arguments) == 2)
+            (date, load) = atom.arguments
+            assert date.match('time', 2)
+            (year,term) = date.arguments
+            loads.append((int(str(year)),int(str(term)),int(str(load))))
     output['schedules'] = schedules
     output['loads'] = loads
 
@@ -56,14 +55,13 @@ def collectDefaultConstraints():
         total = f.read()
     return total
 
-def computeSchedule(all_courses, spec):
+def computeSchedule(institution, spec):
     ctl = clingo.Control()
     with clingo.ast.ProgramBuilder(ctl) as bld:
-        clingo.ast.parse_string(make_asp(all_courses, spec), bld.add)
+        clingo.ast.parse_string(make_asp(institution, spec), bld.add)
         clingo.ast.parse_string(collectDefaultConstraints(), bld.add) # parse from string
 
     ctl.ground([('base', [])])
-    #output = defaultdict(lambda: defaultdict(list))
     output = dict()
     #print(ctl.solve(on_model=print))
     result = ctl.solve(on_model=lambda m: storeModel(m, output))
