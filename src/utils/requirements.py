@@ -33,6 +33,7 @@ class PreReq:
             if self._code in term["courses"]:
                 return True
         return False
+
     def is_beneficial(self, course) -> bool:
         return course.code == self._course.code
 
@@ -51,9 +52,9 @@ class CoReq:
             if self._code in term["courses"]:
                 return True
         return False
+
     def is_beneficial(self, course) -> bool:
         return course.code == self._course.code
-
 
 
 class UocReq:
@@ -75,11 +76,10 @@ class UocReq:
                 course = get_course(course_code)
                 count += course.get_uoc()
         return count >= self._uoc
- 
+
     # this one is wierd, may lead to wierd behaviour
     def is_beneficial(self, course) -> bool:
         return course.uoc > 0
-
 
 
 class DegreeReq:
@@ -88,7 +88,7 @@ class DegreeReq:
     def __init__(self, program) -> None:
         self._program = program
 
-    #TODO: currently not passed, will implement
+    # TODO: currently not passed, will implement
     def is_satisfied(self, plan, _) -> bool:
         return False
 
@@ -96,13 +96,13 @@ class DegreeReq:
 def parse_requirement(prereq_str: str):
     # find ors and ands and split along them
     # assume ands supersede or's - bad assumption, but is what lots of courses use
-    if prereq_str == '':
+    if prereq_str == "":
         return Requirement(True)
-    poss_strings = prereq_str.split('\n')
+    poss_strings = prereq_str.split("\n")
     for string in poss_strings:
-        if string.count('Pre') > 0:
+        if string.count("Pre") > 0:
             # assume these are prerequisites
             # TODO: expand to more
-            ands = string.split('and')
-            ands_and_ors = [*map(lambda a: Or(a.split('or')), ands)]
+            ands = string.split("and")
+            ands_and_ors = [*map(lambda a: Or(a.split("or")), ands)]
             return And(ands_and_ors)

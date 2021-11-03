@@ -3,9 +3,9 @@ import json
 from dataclasses import dataclass, field
 
 from src.utils.requirements import Requirement, parse_requirement
+from src.utils.constants import VALID_TERMS
 
 CODE_PATTERN = re.compile(r"\w{4}\d{4}")
-VALID_TERMS = set(range(4))
 with open("data/faculties.json") as f:
     FACULTIES = set(json.load(f))
 
@@ -38,12 +38,12 @@ class Course:
     @property
     def level(self) -> int:
         return int(self.code[4])
-    
+
     def to_dict(self):
         return {
-            'code': self.code,
-            'terms': self.terms,
-            'raw_requirements': self.raw_requirements,
-            'faculty': self.faculty,
-            'uoc': self.uoc,
+            "code": self.code,
+            "terms": self.terms,
+            "raw_requirements": self.raw_requirements,
+            "faculty": self.faculty,
+            "uoc": self.uoc,
         }
