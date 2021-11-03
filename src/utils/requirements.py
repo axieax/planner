@@ -19,10 +19,8 @@ class Requirement:
     def is_beneficial(self, course) -> bool:
         return self._requirement.is_beneficial(course)
 
-
 class PreReq:
     """Prerequisites"""
-
     def __init__(self, code: str) -> None:
         self._code = code
         self._course = get_course(code)

@@ -6,12 +6,12 @@ def make_course_from_dict(dict) -> Course:
 
 ''' get all courses you need using this function '''
 def get_courses(coursesOutput) -> Course:
-    with open('cleanData.json', 'r') as f:
+    with open('courses.json', 'r') as f:
         courses = json.loads(f.read())
         return map(lambda course : make_course_from_dict(courses[course]), coursesOutput)
 
 ''' if you need a course on the fly, avoid using in loops or recursion '''
 def get_course(course) -> Course:
-    with open('cleanData.json', 'r') as f:
+    with open('courses.json', 'r') as f:
         courses = json.loads(f.read())
         return make_course_from_dict(courses[course])
