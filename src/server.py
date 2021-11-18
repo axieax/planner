@@ -13,7 +13,9 @@ def index():
 def plan():
     payload = request.get_json()
     new_plan = place_courses(payload)
-    return jsonify(new_plan)
+    resp = jsonify(new_plan)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 
 def start_flask_server() -> None:
