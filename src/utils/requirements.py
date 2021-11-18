@@ -1,5 +1,5 @@
-from __future__ import annotations
-from data import get_course
+from data.get_course import get_course
+from src.models.course import Course
 from src.utils.logic import And, Or
 
 # NOTE: if _requirement == true, then no requirements are needed to sit the course
@@ -8,16 +8,18 @@ class Requirement:
         self._requirement = requirement
 
     def is_satisfied(self, plan, term_place) -> bool:
+        if self.has_no_prereqs():
+            return True
         return self._requirement.is_satisfied(plan, term_place)
 
     def has_no_prereqs(self) -> None:
         return self._requirement == True
 
-    def get_beneficial_courses(self, courses):
-        return [*filter(lambda a: self.is_beneficial(a), courses)]
-
-    def is_beneficial(self, course) -> bool:
+    def is_beneficial(self, course: Course) -> bool:
         return self._requirement.is_beneficial(course)
+
+    def get_beneficial_courses(self, courses: list[Course]) -> list[Course]:
+        return [*filter(self.is_beneficial, courses)]
 
 class PreReq:
     """Prerequisites"""
@@ -25,7 +27,7 @@ class PreReq:
         self._code = code
         self._course = get_course(code)
 
-    def is_satisfied(self, plan, term_place) -> bool:
+    def is_satisfied(self, plan, term_place: int) -> bool:
         """
         Predicate for checking whether a prerequisite is satisfied for a plan up to term_place
         """
@@ -35,7 +37,7 @@ class PreReq:
         return False
 
     def is_beneficial(self, course) -> bool:
-        return course.code == self._course.code
+        return course.code == self._code
 
 
 class CoReq:
@@ -101,8 +103,9 @@ def parse_requirement(prereq_str: str):
     poss_strings = prereq_str.split("\n")
     for string in poss_strings:
         if string.count("Pre") > 0:
+            string = " ".join(string.split()[1:])
             # assume these are prerequisites
             # TODO: expand to more
             ands = string.split("and")
-            ands_and_ors = [*map(lambda a: Or(a.split("or")), ands)]
-            return And(ands_and_ors)
+            ands_and_ors = [Or(PreReq(code.strip()) for code in a.split("or")) for a in ands]
+            return Requirement(And(ands_and_ors))

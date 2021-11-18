@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from src.plan.algo import place_courses
+from src.plan import place_courses
 
 APP = Flask(__name__)
 
@@ -9,13 +9,10 @@ def index():
     return "Hello, World!"
 
 
-@APP.route("/plan/", methods=["POST"])
+@APP.route("/plan", methods=["POST"])
 def plan():
     payload = request.get_json()
-    degree_details = payload["degree_details"]
-    plan_details = payload["plan_details"]
-    plan = payload["plan"]
-    new_plan = place_courses(degree_details, plan_details, plan)
+    new_plan = place_courses(payload)
     return jsonify(new_plan)
 
 

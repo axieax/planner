@@ -22,7 +22,7 @@ def greedy_per_term(plan_details: PlanType, selected_courses: list[Course]):
     # TODO: allocate more terms
 
     # place courses
-    for term_index, term in enumerate(plan["terms"]):
+    for term_index, term in enumerate(plan):
         unsatisfied = []
         while not pq.empty():
             # try to place courses from the PriorityQueue
@@ -31,7 +31,7 @@ def greedy_per_term(plan_details: PlanType, selected_courses: list[Course]):
                 # course can be placed
                 term["term"] in course.terms
                 # requirements satisfied
-                and course.requirements.is_satisfied(plan_details, term_index)
+                and course.requirements.is_satisfied(plan, term_index)
                 # uoc won't exceed maximum
                 and course.uoc + term["current_uoc"] <= term["max_uoc"]
                 # NOTE: walrus operator can be used for the above LHS

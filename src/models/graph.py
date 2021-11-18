@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Directed Graph ADT
 """
@@ -15,7 +14,7 @@ class Graph:
         '''
         self.num_vertices = len(courses)
         self.no_pre_courses = []
-        self.connections = {course: [] for course in courses}
+        self.connections = {course.code: [] for course in courses}
         self.connections_setup(courses)
 
     def connections_setup(self, courses: list[Course]):
@@ -25,16 +24,17 @@ class Graph:
                 self.no_pre_courses.append(course.code)
             else:
                 for requirement in course.requirements.get_beneficial_courses(courses):
-                    if requirement not in self.connections[requirement]:
-                        self.connections[requirement].append(course.code)
+                    if requirement.code not in self.connections[requirement.code]:
+                        self.connections[requirement.code].append(course.code)
 
-    def immediate_dependencies(self, course_code):
+    def immediate_dependencies(self, course_code) -> list[str]:
         '''
         Returns a list of codes (str) for courses that have the given course_code (str) as an immediate prerequisite
         '''
         return self.connections[course_code]
 
-    def total_dependencies(self, course_code, memo):
+    def total_dependencies(self, course_code, memo : dict = {}) -> list[str]:
+        memo = memo.copy()
         '''
         Returns a list of codes (str) for courses that depend on the given course_code (str)
         as a prerequisite at some point using a depth first search (dfs) algorithm
