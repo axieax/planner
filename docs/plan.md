@@ -1,6 +1,6 @@
 # Plan json
 
-Frontend to backend request
+Frontend to backend request example request.
 
 ```json
 {
