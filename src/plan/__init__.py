@@ -1,4 +1,5 @@
 """ Main Algorithm """
+from functools import reduce
 from typing import Callable
 from data import get_courses
 from src.plan.greedy import greedy_per_term
@@ -17,7 +18,13 @@ def place_courses(
     """
     # get Course objects for a user's selected courses
     selected_courses = get_courses(plan_details["selected_courses"])
-
+    # add current_uoc
+    for term in plan_details["plan"]:
+        given_courses = get_courses(term["courses"])
+        term["current_uoc"] = reduce(lambda a, b: a + b.uoc, given_courses, 0)
+        for course in given_courses:
+            selected_courses.remove(course)
+    
     # TODO: verify that the current plan is sane
     # 1. validate PlanType
 

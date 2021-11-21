@@ -1,5 +1,7 @@
 from __future__ import annotations
-from src.utils.constants import NUM_TERMS, TERMS
+from itertools import accumulate
+from data.get_course import get_courses
+from functools import reduce
 from src.models import PriorityQueue, Graph, Course, PlanType, Plan, Term
 
 
