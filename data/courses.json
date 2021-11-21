@@ -562,7 +562,7 @@
         "terms": [
             1
         ],
-        "raw_requirements": "Prerequisite: (MMAN1300 or ENGG1300 or DPST1072 or CVEN1300 ) AND (MMAN2600 or ENGG2500) AND MMAN2700",
+        "raw_requirements": "Prerequisite: (MMAN1300 or ENGG1300 or DPST1072 or CVEN1300) AND (MMAN2600 or ENGG2500) AND MMAN2700",
         "faculty": "Faculty of Engineering",
         "uoc": 6
     },
@@ -631,7 +631,7 @@
         "terms": [
             2
         ],
-        "raw_requirements": "Prerequisite: BABS1201 or DPST1051This course is restricted to students enrolled in Medical Science (3991) program",
+        "raw_requirements": "Prerequisite: BABS1201 or DPST1051. This course is restricted to students enrolled in Medical Science (3991) program",
         "faculty": "Faculty of Medicine and Health",
         "uoc": 6
     },
