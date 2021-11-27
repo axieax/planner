@@ -1,65 +1,54 @@
 from data.get_course import get_course
-from src.models.course import Course
+from src.models import Course, PlanType, Requirement
 from src.utils.logic import And, Or
 
-# NOTE: if _requirement == true, then no requirements are needed to sit the course
-class Requirement:
-    def __init__(self, requirement) -> None:
-        self._requirement = requirement
 
-    def is_satisfied(self, plan, term_place) -> bool:
-        if self.has_no_prereqs():
-            return True
-        return self._requirement.is_satisfied(plan, term_place)
+class CourseReq(Requirement):
+    """Course Requirement abstract class"""
 
-    def has_no_prereqs(self) -> None:
-        return self._requirement == True
-
-    def is_beneficial(self, course: Course) -> bool:
-        return self._requirement.is_beneficial(course)
-
-    def get_beneficial_courses(self, courses: list[Course]) -> list[Course]:
-        return [*filter(self.is_beneficial, courses)]
-
-class PreReq:
-    """Prerequisites"""
     def __init__(self, code: str) -> None:
         self._code = code
         self._course = get_course(code)
 
-    def is_satisfied(self, plan, term_place: int) -> bool:
+    def filter_relevant_courses(self, courses: list[Course]) -> list[Course]:
+        return [course for course in courses if course.code == self._code]
+
+
+class PreReq(CourseReq):
+    """Prerequisites"""
+
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+
+    def is_satisfied(self, plan_details: PlanType, term_place: int) -> bool:
         """
         Predicate for checking whether a prerequisite is satisfied for a plan up to term_place
         """
-        for term in plan[:term_place]:
+        terms = plan_details["plan"]["terms"]
+        for term in terms[:term_place]:
             if self._code in term["courses"]:
                 return True
         return False
 
-    def is_beneficial(self, course) -> bool:
-        return course.code == self._code
 
-
-class CoReq:
+class CoReq(CourseReq):
     """Corequisites"""
 
     def __init__(self, code) -> None:
-        self._code = code
+        super().__init__(code)
 
-    def is_satisfied(self, plan, term_place) -> bool:
+    def is_satisfied(self, plan_details: PlanType, term_place: int) -> bool:
         """
         Predicate for checking whether a corequisite is satisfied for a plan up to term_place
         """
-        for term in plan[: term_place + 1]:
+        terms = plan_details["plan"]["terms"]
+        for term in terms[: term_place + 1]:
             if self._code in term["courses"]:
                 return True
         return False
 
-    def is_beneficial(self, course) -> bool:
-        return course.code == self._course.code
 
-
-class UocReq:
+class UocReq(Requirement):
     """UOC Requirement"""
 
     # also #courses
@@ -79,9 +68,8 @@ class UocReq:
                 count += course.get_uoc()
         return count >= self._uoc
 
-    # this one is wierd, may lead to wierd behaviour
-    def is_beneficial(self, course) -> bool:
-        return course.uoc > 0
+    def is_beneficial(self, course: Course) -> bool:
+        return False
 
 
 class DegreeReq:
@@ -95,11 +83,11 @@ class DegreeReq:
         return False
 
 
-def parse_requirement(prereq_str: str):
+def parse_requirement(prereq_str: str) -> Requirement:
     # find ors and ands and split along them
     # assume ands supersede or's - bad assumption, but is what lots of courses use
     if prereq_str == "":
-        return Requirement(True)
+        return None
     poss_strings = prereq_str.split("\n")
     for string in poss_strings:
         if string.count("Pre") > 0:
@@ -107,5 +95,7 @@ def parse_requirement(prereq_str: str):
             # assume these are prerequisites
             # TODO: expand to more
             ands = string.split("and")
-            ands_and_ors = [Or(PreReq(code.strip()) for code in a.split("or")) for a in ands]
-            return Requirement(And(ands_and_ors))
+            ands_and_ors = [
+                Or(PreReq(code.strip()) for code in a.split("or")) for a in ands
+            ]
+            return And(ands_and_ors)

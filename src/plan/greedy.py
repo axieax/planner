@@ -49,3 +49,6 @@ def greedy_per_term(plan_details: PlanType, selected_courses: list[Course]):
 
     # update plan details
     return plan_details
+
+
+# TODO: add greedy by requirements
