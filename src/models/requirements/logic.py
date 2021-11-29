@@ -1,5 +1,6 @@
-from src.models import Course, PlanType
-from src.utils.requirements import Requirement
+from src.models.course import Course
+from src.models.plan import PlanType
+from src.models.requirements.requirement import Requirement
 
 
 # TODO: args as *args instead

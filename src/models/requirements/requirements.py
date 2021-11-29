@@ -1,6 +1,16 @@
-from data.get_course import get_course
-from src.models import Course, PlanType, Requirement
-from src.utils.logic import And, Or
+import data
+from src.models.course import Course
+from src.models.plan import PlanType
+from src.models.requirements.logic import And, Or
+from src.models.requirements.requirement import Requirement
+
+
+class NullReq(Requirement):
+    def filter_relevant_courses(self, courses: list[Course]) -> list[Course]:
+        return []
+
+    def is_satisfied(self, plan_details: PlanType, term_place: int) -> bool:
+        return True
 
 
 class CourseReq(Requirement):
@@ -8,7 +18,7 @@ class CourseReq(Requirement):
 
     def __init__(self, code: str) -> None:
         self._code = code
-        self._course = get_course(code)
+        self._course = data.get_course(code)
 
     def filter_relevant_courses(self, courses: list[Course]) -> list[Course]:
         return [course for course in courses if course.code == self._code]
@@ -64,7 +74,7 @@ class UocReq(Requirement):
         count = 0
         for term in plan[:term_place]:
             for course_code in term["courses"]:
-                course = get_course(course_code)
+                course = data.get_course(course_code)
                 count += course.get_uoc()
         return count >= self._uoc
 

@@ -1,5 +1,4 @@
-from src.utils.logic import And, Or
-from src.utils.requirements import Requirement
+from src.models import Requirement, And, Or
 
 # case insensitive, optional plural s
 COURSE_REQUIREMENT_MAP = {
@@ -13,7 +12,7 @@ BINARY_OPERATORS = {"and", "or"}
 # TODO: not
 
 
-def parse(requirement_str: str) -> Requirement:
+def parse_requirement(requirement_str: str) -> Requirement:
     # highlight operators and expand outwards
     tokens = requirement_str.split()
     regions = requirement_str.split(", ")
